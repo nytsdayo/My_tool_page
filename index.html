@@ -249,7 +249,7 @@
             <strong>💡 ヒント</strong>
             <ul>
                 <li>初回使用時はマイクへのアクセス許可が必要です</li>
-                <li>Chrome、Edge、Safariで動作します</li>
+                <li>Chrome、Edgeで動作します</li>
                 <li>静かな環境で話すとより正確に認識されます</li>
             </ul>
         </div>
@@ -266,6 +266,9 @@
         // SpeechRecognition APIの取得（ブラウザ互換性対応）
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
+        // 定数
+        const RECOGNITION_PLACEHOLDER = '認識中...';
+
         let recognition = null;
         let isRecording = false;
         let finalTranscript = '';
@@ -274,7 +277,7 @@
         function checkBrowserSupport() {
             if (!SpeechRecognition) {
                 showError('お使いのブラウザは音声認識に対応していません', 
-                    'Chrome、Edge、またはSafariをお使いください。');
+                    'Chrome、Edgeをお使いください。');
                 micButton.disabled = true;
                 return false;
             }
@@ -333,7 +336,7 @@
                 
                 // 結果がない場合のプレースホルダー
                 if (!finalTranscript && !interimTranscript) {
-                    result.textContent = '認識中...';
+                    result.textContent = RECOGNITION_PLACEHOLDER;
                 }
             };
 
@@ -390,7 +393,7 @@
             } else {
                 // 新しい録音開始時に結果をリセット
                 finalTranscript = '';
-                result.textContent = '認識中...';
+                result.textContent = RECOGNITION_PLACEHOLDER;
                 recognition.start();
             }
         }
