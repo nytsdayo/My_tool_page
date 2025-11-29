@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>音声入力ページ</title>
+    <title>Voice Input Page</title>
     <style>
         * {
             margin: 0;
@@ -12,7 +12,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
@@ -33,443 +33,200 @@
         h1 {
             text-align: center;
             color: #333;
-            margin-bottom: 10px;
-            font-size: 1.8rem;
-        }
-
-        .subtitle {
-            text-align: center;
-            color: #666;
             margin-bottom: 30px;
-            font-size: 0.9rem;
+            font-size: 2rem;
         }
 
-        .language-selector {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .language-selector select {
-            padding: 10px 20px;
-            font-size: 1rem;
-            border: 2px solid #667eea;
-            border-radius: 25px;
-            background: white;
-            color: #333;
-            cursor: pointer;
-            outline: none;
-            transition: all 0.3s ease;
-            min-width: 200px;
-            text-align: center;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23667eea' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 15px center;
-            padding-right: 40px;
-        }
-
-        .language-selector select:hover {
-            border-color: #764ba2;
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        .language-selector select:focus {
-            border-color: #764ba2;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
-        }
-
-        .language-label {
-            text-align: center;
-            color: #666;
-            font-size: 0.85rem;
-            margin-bottom: 8px;
-        }
-
-        .mic-button-container {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 30px;
-        }
-
-        #micButton {
-            width: 100px;
-            height: 100px;
+        .voice-button {
+            display: block;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
             border-radius: 50%;
             border: none;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            font-size: 40px;
             cursor: pointer;
             transition: all 0.3s ease;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            position: relative;
+        }
+
+        .voice-button:hover {
+            transform: scale(1.05);
             box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
         }
 
-        #micButton:hover {
-            transform: scale(1.05);
-            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
-        }
-
-        #micButton:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-
-        #micButton.recording {
-            background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+        .voice-button.listening {
             animation: pulse 1.5s infinite;
         }
 
         @keyframes pulse {
             0% {
-                box-shadow: 0 0 0 0 rgba(245, 87, 108, 0.7);
+                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
             }
             70% {
-                box-shadow: 0 0 0 20px rgba(245, 87, 108, 0);
+                box-shadow: 0 0 0 20px rgba(102, 126, 234, 0);
             }
             100% {
-                box-shadow: 0 0 0 0 rgba(245, 87, 108, 0);
+                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
             }
         }
 
-        .status-container {
+        .voice-button svg {
+            width: 50px;
+            height: 50px;
+            fill: white;
+        }
+
+        .status {
             text-align: center;
+            color: #666;
             margin-bottom: 20px;
+            font-size: 1.1rem;
         }
 
-        #status {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        #status.ready {
-            background: #e8f5e9;
-            color: #2e7d32;
-        }
-
-        #status.recording {
-            background: #ffebee;
-            color: #c62828;
-        }
-
-        #status.error {
-            background: #fff3e0;
-            color: #e65100;
-        }
-
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: currentColor;
-        }
-
-        #status.recording .status-dot {
-            animation: blink 1s infinite;
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-
-        .result-container {
+        .result-area {
             background: #f8f9fa;
-            border-radius: 12px;
+            border-radius: 10px;
             padding: 20px;
             min-height: 150px;
-            max-height: 300px;
-            overflow-y: auto;
+            border: 2px dashed #ddd;
         }
 
-        .result-label {
-            font-size: 0.8rem;
-            color: #666;
+        .result-area h3 {
+            color: #333;
             margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            font-size: 1rem;
         }
 
         #result {
+            color: #555;
+            line-height: 1.6;
             font-size: 1.1rem;
-            line-height: 1.8;
-            color: #333;
-            word-wrap: break-word;
         }
 
-        #result .interim {
-            color: #999;
-            font-style: italic;
-        }
-
-        .error-message {
+        .not-supported {
             background: #ffebee;
-            border: 1px solid #ffcdd2;
-            border-radius: 12px;
-            padding: 20px;
             color: #c62828;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .error-message h3 {
-            margin-bottom: 10px;
-        }
-
-        .info-box {
-            background: #e3f2fd;
-            border-radius: 12px;
             padding: 15px;
-            margin-top: 20px;
-            font-size: 0.85rem;
-            color: #1565c0;
-        }
-
-        .info-box ul {
-            margin-left: 20px;
-            margin-top: 10px;
-        }
-
-        .info-box li {
-            margin-bottom: 5px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
         }
 
         @media (max-width: 480px) {
             .container {
-                padding: 25px;
+                padding: 20px;
             }
 
             h1 {
-                font-size: 1.4rem;
+                font-size: 1.5rem;
             }
 
-            #micButton {
-                width: 80px;
-                height: 80px;
-                font-size: 32px;
+            .voice-button {
+                width: 100px;
+                height: 100px;
             }
 
-            #result {
-                font-size: 1rem;
+            .voice-button svg {
+                width: 40px;
+                height: 40px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎤 音声入力</h1>
-        <p class="subtitle">マイクボタンを押して話しかけてください</p>
-
-        <div id="errorContainer"></div>
-
-        <div class="language-selector">
-            <div>
-                <div class="language-label">🌐 認識言語 / Language</div>
-                <select id="languageSelect">
-                    <option value="ja-JP">🇯🇵 日本語</option>
-                    <option value="en-US">🇺🇸 English (US)</option>
-                    <option value="en-GB">🇬🇧 English (UK)</option>
-                </select>
-            </div>
+        <h1>🎤 音声入力ページ</h1>
+        
+        <div class="not-supported" id="notSupported">
+            お使いのブラウザは音声認識に対応していません。<br>
+            Chrome または Edge をお使いください。
         </div>
-
-        <div class="mic-button-container">
-            <button id="micButton" aria-label="音声入力を開始">🎙️</button>
-        </div>
-
-        <div class="status-container">
-            <div id="status" class="ready">
-                <span class="status-dot"></span>
-                <span id="statusText">待機中</span>
-            </div>
-        </div>
-
-        <div class="result-container">
-            <div class="result-label">認識結果</div>
-            <div id="result">ここに認識結果が表示されます...</div>
-        </div>
-
-        <div class="info-box">
-            <strong>💡 ヒント</strong>
-            <ul>
-                <li>初回使用時はマイクへのアクセス許可が必要です</li>
-                <li>Chrome、Edgeで動作します</li>
-                <li>静かな環境で話すとより正確に認識されます</li>
-            </ul>
+        
+        <button class="voice-button" id="voiceButton">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1 1.93c-3.94-.49-7-3.85-7-7.93V7h2v1c0 2.76 2.24 5 5 5s5-2.24 5-5V7h2v1c0 4.08-3.06 7.44-7 7.93V18h3v2H9v-2h3v-2.07z"/>
+            </svg>
+        </button>
+        
+        <p class="status" id="status">マイクボタンをクリックして音声入力を開始</p>
+        
+        <div class="result-area">
+            <h3>認識結果:</h3>
+            <p id="result">ここに認識結果が表示されます...</p><span id="interim" style="color: #999;"></span>
         </div>
     </div>
 
     <script>
-        // DOM要素の取得
-        const micButton = document.getElementById('micButton');
+        const voiceButton = document.getElementById('voiceButton');
         const status = document.getElementById('status');
-        const statusText = document.getElementById('statusText');
         const result = document.getElementById('result');
-        const errorContainer = document.getElementById('errorContainer');
-        const languageSelect = document.getElementById('languageSelect');
+        const interim = document.getElementById('interim');
+        const notSupported = document.getElementById('notSupported');
+        let finalText = '';
 
-        // SpeechRecognition APIの取得（ブラウザ互換性対応）
+        // Check for browser support
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-        // 定数
-        const RECOGNITION_PLACEHOLDER = '認識中...';
+        if (!SpeechRecognition) {
+            notSupported.style.display = 'block';
+            voiceButton.style.display = 'none';
+            status.style.display = 'none';
+        } else {
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'ja-JP';
+            recognition.interimResults = true;
+            recognition.continuous = true;
 
-        // 言語設定
-        let currentLanguage = 'ja-JP';
+            let isListening = false;
 
-        let recognition = null;
-        let isRecording = false;
-        let finalTranscript = '';
+            voiceButton.addEventListener('click', () => {
+                if (isListening) {
+                    recognition.stop();
+                } else {
+                    recognition.start();
+                }
+            });
 
-        // ブラウザ対応チェック
-        function checkBrowserSupport() {
-            if (!SpeechRecognition) {
-                showError('お使いのブラウザは音声認識に対応していません', 
-                    'Chrome、Edgeをお使いください。');
-                micButton.disabled = true;
-                return false;
-            }
-            return true;
-        }
+            recognition.addEventListener('start', () => {
+                isListening = true;
+                voiceButton.classList.add('listening');
+                status.textContent = '🎤 音声を聞いています...';
+                finalText = '';
+                result.textContent = '';
+                interim.textContent = '';
+            });
 
-        // エラー表示
-        function showError(title, message) {
-            errorContainer.innerHTML = `
-                <div class="error-message">
-                    <h3>⚠️ ${title}</h3>
-                    <p>${message}</p>
-                </div>
-            `;
-            updateStatus('error', 'エラー');
-        }
+            recognition.addEventListener('end', () => {
+                isListening = false;
+                voiceButton.classList.remove('listening');
+                status.textContent = 'マイクボタンをクリックして音声入力を開始';
+                interim.textContent = '';
+            });
 
-        // エラークリア
-        function clearError() {
-            errorContainer.innerHTML = '';
-        }
-
-        // ステータス更新
-        function updateStatus(statusClass, text) {
-            status.className = statusClass;
-            statusText.textContent = text;
-        }
-
-        // 音声認識の初期化
-        function initSpeechRecognition() {
-            if (!checkBrowserSupport()) return;
-
-            recognition = new SpeechRecognition();
-            
-            // 設定
-            recognition.lang = currentLanguage;   // 選択された言語
-            recognition.continuous = true;        // 継続的に認識
-            recognition.interimResults = true;    // 途中結果も取得
-
-            // 認識結果の処理
-            recognition.onresult = (event) => {
+            recognition.addEventListener('result', (event) => {
                 let interimTranscript = '';
 
                 for (let i = event.resultIndex; i < event.results.length; i++) {
                     const transcript = event.results[i][0].transcript;
                     if (event.results[i].isFinal) {
-                        finalTranscript += transcript;
+                        finalText += transcript + ' ';
                     } else {
                         interimTranscript += transcript;
                     }
                 }
 
-                // 結果の表示
-                result.innerHTML = finalTranscript + 
-                    (interimTranscript ? `<span class="interim">${interimTranscript}</span>` : '');
-                
-                // 結果がない場合のプレースホルダー
-                if (!finalTranscript && !interimTranscript) {
-                    result.textContent = RECOGNITION_PLACEHOLDER;
-                }
-            };
+                result.textContent = finalText;
+                interim.textContent = interimTranscript;
+            });
 
-            // 認識開始時
-            recognition.onstart = () => {
-                isRecording = true;
-                micButton.classList.add('recording');
-                updateStatus('recording', '録音中...');
-                clearError();
-            };
-
-            // 認識終了時
-            recognition.onend = () => {
-                isRecording = false;
-                micButton.classList.remove('recording');
-                updateStatus('ready', '待機中');
-            };
-
-            // エラー処理
-            recognition.onerror = (event) => {
-                isRecording = false;
-                micButton.classList.remove('recording');
-
-                switch (event.error) {
-                    case 'not-allowed':
-                        showError('マイクへのアクセスが拒否されました', 
-                            'ブラウザの設定でマイクへのアクセスを許可してください。');
-                        break;
-                    case 'no-speech':
-                        updateStatus('ready', '待機中');
-                        // no-speechは通常のエラーとして扱わない
-                        break;
-                    case 'audio-capture':
-                        showError('マイクが見つかりません', 
-                            'マイクが接続されているか確認してください。');
-                        break;
-                    case 'network':
-                        showError('ネットワークエラー', 
-                            'インターネット接続を確認してください。');
-                        break;
-                    default:
-                        showError('エラーが発生しました', 
-                            `エラー: ${event.error}`);
-                }
-            };
+            recognition.addEventListener('error', (event) => {
+                console.error('Speech recognition error:', event.error);
+                status.textContent = 'エラーが発生しました: ' + event.error;
+                isListening = false;
+                voiceButton.classList.remove('listening');
+            });
         }
-
-        // 録音の開始/停止
-        function toggleRecording() {
-            if (!recognition) return;
-
-            if (isRecording) {
-                recognition.stop();
-            } else {
-                // 新しい録音開始時に結果をリセット
-                finalTranscript = '';
-                result.textContent = RECOGNITION_PLACEHOLDER;
-                recognition.start();
-            }
-        }
-
-        // イベントリスナー
-        micButton.addEventListener('click', toggleRecording);
-
-        // 言語変更時の処理
-        languageSelect.addEventListener('change', (event) => {
-            currentLanguage = event.target.value;
-            // 録音中の場合は停止して再初期化
-            if (isRecording) {
-                recognition.stop();
-            }
-            initSpeechRecognition();
-        });
-
-        // 初期化
-        initSpeechRecognition();
     </script>
 </body>
 </html>
