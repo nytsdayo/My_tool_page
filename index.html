@@ -272,6 +272,9 @@
                 }
             });
 
+            // Initialize UI language on page load
+            updateUILanguage(languageSelect.value);
+
             voiceButton.addEventListener('click', () => {
                 if (isListening) {
                     recognition.stop();
