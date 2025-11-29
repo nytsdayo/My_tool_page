@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音声入力ページ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+
+        .mic-button-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        #micButton {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 40px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        #micButton:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+        }
+
+        #micButton:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        #micButton.recording {
+            background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(245, 87, 108, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 20px rgba(245, 87, 108, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(245, 87, 108, 0);
+            }
+        }
+
+        .status-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        #status.ready {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        #status.recording {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        #status.error {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        #status.recording .status-dot {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .result-container {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 150px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .result-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        #result {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #333;
+            word-wrap: break-word;
+        }
+
+        #result .interim {
+            color: #999;
+            font-style: italic;
+        }
+
+        .error-message {
+            background: #ffebee;
+            border: 1px solid #ffcdd2;
+            border-radius: 12px;
+            padding: 20px;
+            color: #c62828;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .error-message h3 {
+            margin-bottom: 10px;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: #1565c0;
+        }
+
+        .info-box ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .info-box li {
+            margin-bottom: 5px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 1.4rem;
+            }
+
+            #micButton {
+                width: 80px;
+                height: 80px;
+                font-size: 32px;
+            }
+
+            #result {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎤 音声入力</h1>
+        <p class="subtitle">マイクボタンを押して話しかけてください</p>
+
+        <div id="errorContainer"></div>
+
+        <div class="mic-button-container">
+            <button id="micButton" aria-label="音声入力を開始">🎙️</button>
+        </div>
+
+        <div class="status-container">
+            <div id="status" class="ready">
+                <span class="status-dot"></span>
+                <span id="statusText">待機中</span>
+            </div>
+        </div>
+
+        <div class="result-container">
+            <div class="result-label">認識結果</div>
+            <div id="result">ここに認識結果が表示されます...</div>
+        </div>
+
+        <div class="info-box">
+            <strong>💡 ヒント</strong>
+            <ul>
+                <li>初回使用時はマイクへのアクセス許可が必要です</li>
+                <li>Chrome、Edge、Safariで動作します</li>
+                <li>静かな環境で話すとより正確に認識されます</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // DOM要素の取得
+        const micButton = document.getElementById('micButton');
+        const status = document.getElementById('status');
+        const statusText = document.getElementById('statusText');
+        const result = document.getElementById('result');
+        const errorContainer = document.getElementById('errorContainer');
+
+        // SpeechRecognition APIの取得（ブラウザ互換性対応）
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        let recognition = null;
+        let isRecording = false;
+        let finalTranscript = '';
+
+        // ブラウザ対応チェック
+        function checkBrowserSupport() {
+            if (!SpeechRecognition) {
+                showError('お使いのブラウザは音声認識に対応していません', 
+                    'Chrome、Edge、またはSafariをお使いください。');
+                micButton.disabled = true;
+                return false;
+            }
+            return true;
+        }
+
+        // エラー表示
+        function showError(title, message) {
+            errorContainer.innerHTML = `
+                <div class="error-message">
+                    <h3>⚠️ ${title}</h3>
+                    <p>${message}</p>
+                </div>
+            `;
+            updateStatus('error', 'エラー');
+        }
+
+        // エラークリア
+        function clearError() {
+            errorContainer.innerHTML = '';
+        }
+
+        // ステータス更新
+        function updateStatus(statusClass, text) {
+            status.className = statusClass;
+            statusText.textContent = text;
+        }
+
+        // 音声認識の初期化
+        function initSpeechRecognition() {
+            if (!checkBrowserSupport()) return;
+
+            recognition = new SpeechRecognition();
+            
+            // 設定
+            recognition.lang = 'ja-JP';           // 日本語
+            recognition.continuous = true;        // 継続的に認識
+            recognition.interimResults = true;    // 途中結果も取得
+
+            // 認識結果の処理
+            recognition.onresult = (event) => {
+                let interimTranscript = '';
+
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript;
+                    } else {
+                        interimTranscript += transcript;
+                    }
+                }
+
+                // 結果の表示
+                result.innerHTML = finalTranscript + 
+                    (interimTranscript ? `<span class="interim">${interimTranscript}</span>` : '');
+                
+                // 結果がない場合のプレースホルダー
+                if (!finalTranscript && !interimTranscript) {
+                    result.textContent = '認識中...';
+                }
+            };
+
+            // 認識開始時
+            recognition.onstart = () => {
+                isRecording = true;
+                micButton.classList.add('recording');
+                updateStatus('recording', '録音中...');
+                clearError();
+            };
+
+            // 認識終了時
+            recognition.onend = () => {
+                isRecording = false;
+                micButton.classList.remove('recording');
+                updateStatus('ready', '待機中');
+            };
+
+            // エラー処理
+            recognition.onerror = (event) => {
+                isRecording = false;
+                micButton.classList.remove('recording');
+
+                switch (event.error) {
+                    case 'not-allowed':
+                        showError('マイクへのアクセスが拒否されました', 
+                            'ブラウザの設定でマイクへのアクセスを許可してください。');
+                        break;
+                    case 'no-speech':
+                        updateStatus('ready', '待機中');
+                        // no-speechは通常のエラーとして扱わない
+                        break;
+                    case 'audio-capture':
+                        showError('マイクが見つかりません', 
+                            'マイクが接続されているか確認してください。');
+                        break;
+                    case 'network':
+                        showError('ネットワークエラー', 
+                            'インターネット接続を確認してください。');
+                        break;
+                    default:
+                        showError('エラーが発生しました', 
+                            `エラー: ${event.error}`);
+                }
+            };
+        }
+
+        // 録音の開始/停止
+        function toggleRecording() {
+            if (!recognition) return;
+
+            if (isRecording) {
+                recognition.stop();
+            } else {
+                // 新しい録音開始時に結果をリセット
+                finalTranscript = '';
+                result.textContent = '認識中...';
+                recognition.start();
+            }
+        }
+
+        // イベントリスナー
+        micButton.addEventListener('click', toggleRecording);
+
+        // 初期化
+        initSpeechRecognition();
+    </script>
+</body>
+</html>
