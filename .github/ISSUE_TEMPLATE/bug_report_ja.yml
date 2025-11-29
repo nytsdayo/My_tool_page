@@ -1,0 +1,65 @@
+name: バグ報告
+description: バグを報告して改善にご協力ください
+title: "[バグ]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        バグ報告にご協力いただきありがとうございます！
+  - type: textarea
+    id: description
+    attributes:
+      label: バグの説明
+      description: バグの内容を明確かつ簡潔に説明してください。
+      placeholder: バグの内容を説明してください...
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 再現手順
+      description: バグを再現するための手順を記載してください。
+      placeholder: |
+        1. '...' にアクセス
+        2. '...' をクリック
+        3. エラーが発生
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期待される動作
+      description: 期待される動作を明確かつ簡潔に説明してください。
+      placeholder: どのような動作が期待されますか？
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: 実際の動作
+      description: 実際に発生した動作を説明してください。
+      placeholder: 実際にはどのような動作が発生しましたか？
+    validations:
+      required: true
+  - type: dropdown
+    id: browser
+    attributes:
+      label: ブラウザ
+      description: どのブラウザを使用していますか？
+      options:
+        - Chrome
+        - Edge
+        - Safari
+        - Firefox
+        - その他
+    validations:
+      required: true
+  - type: textarea
+    id: additional
+    attributes:
+      label: 追加情報
+      description: 問題に関するその他の情報があれば追加してください。
+      placeholder: その他の関連情報...
+    validations:
+      required: false
