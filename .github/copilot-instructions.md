@@ -2,6 +2,10 @@
 
 This file provides guidance for GitHub Copilot when working on issues in this repository.
 
+## Response Language
+
+**Always respond in Japanese (日本語).** All explanations, comments, and communications should be written in Japanese to maintain consistency with the project's Japanese-language focus.
+
 ## Project Overview
 
 This is a simple voice input web page that uses the Web Speech API for speech-to-text functionality. The project is hosted on GitHub Pages.
