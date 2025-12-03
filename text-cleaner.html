@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>テキストクリーナー - カタカナ・区切り除去</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
+        .description {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .input-section, .output-section {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+            line-height: 1.6;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        textarea#output {
+            background: #f8f9fa;
+            cursor: default;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            font-size: 1rem;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .btn-secondary:hover {
+            background: #dee2e6;
+        }
+
+        .btn-copy {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-copy:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-copy.copied {
+            background: #17a2b8;
+        }
+
+        .example {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .example h4 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .example-text {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.85rem;
+            color: #555;
+            word-break: break-all;
+        }
+
+        .example-text.input-example {
+            margin-bottom: 5px;
+        }
+
+        .example-text.output-example {
+            color: #28a745;
+        }
+
+        .nav-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.4rem;
+            }
+
+            .btn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+
+            textarea {
+                min-height: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧹 テキストクリーナー</h1>
+        <p class="description">
+            音声認識結果からカタカナのルビと区切り文字（|）を除去します
+        </p>
+
+        <div class="example">
+            <h4>📝 使用例:</h4>
+            <p class="example-text input-example">入力: 今|イマから|カラえっと|エットあの|アノ卒論|ソツロンの|ノ</p>
+            <p class="example-text output-example">出力: 今からえっとあの卒論の</p>
+        </div>
+
+        <div class="input-section">
+            <label for="input">入力テキスト:</label>
+            <textarea id="input" placeholder="ここにテキストを貼り付けてください..."></textarea>
+        </div>
+
+        <div class="button-group">
+            <button class="btn btn-primary" id="cleanBtn">変換する</button>
+            <button class="btn btn-secondary" id="clearBtn">クリア</button>
+        </div>
+
+        <div class="output-section">
+            <label for="output">変換結果:</label>
+            <textarea id="output" readonly placeholder="変換結果がここに表示されます..."></textarea>
+        </div>
+
+        <div class="button-group">
+            <button class="btn btn-copy" id="copyBtn">📋 結果をコピー</button>
+        </div>
+
+        <a href="index.html" class="nav-link">🎤 音声入力ページへ戻る</a>
+    </div>
+
+    <script>
+        const inputTextarea = document.getElementById('input');
+        const outputTextarea = document.getElementById('output');
+        const cleanBtn = document.getElementById('cleanBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const copyBtn = document.getElementById('copyBtn');
+
+        /**
+         * テキストからカタカナと「|」を除去する
+         * パターン: |カタカナ を除去
+         * @param {string} text - 入力テキスト
+         * @returns {string} - クリーンなテキスト
+         */
+        function cleanText(text) {
+            // |に続くカタカナ（長音符ーを含む）を除去
+            // パターン: |[カタカナ]+ を空文字に置換
+            const cleaned = text.replace(/\|[ァ-ヶー]+/g, '');
+            return cleaned;
+        }
+
+        // 変換ボタン
+        cleanBtn.addEventListener('click', () => {
+            const inputText = inputTextarea.value;
+            const cleanedText = cleanText(inputText);
+            outputTextarea.value = cleanedText;
+        });
+
+        // 入力時にリアルタイム変換
+        inputTextarea.addEventListener('input', () => {
+            const inputText = inputTextarea.value;
+            const cleanedText = cleanText(inputText);
+            outputTextarea.value = cleanedText;
+        });
+
+        // クリアボタン
+        clearBtn.addEventListener('click', () => {
+            inputTextarea.value = '';
+            outputTextarea.value = '';
+            inputTextarea.focus();
+        });
+
+        // コピーボタン
+        copyBtn.addEventListener('click', async () => {
+            const textToCopy = outputTextarea.value;
+            if (!textToCopy) {
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(textToCopy);
+                copyBtn.textContent = '✅ コピーしました!';
+                copyBtn.classList.add('copied');
+                
+                setTimeout(() => {
+                    copyBtn.textContent = '📋 結果をコピー';
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            } catch (err) {
+                // フォールバック: 古いブラウザ対応
+                outputTextarea.select();
+                document.execCommand('copy');
+                copyBtn.textContent = '✅ コピーしました!';
+                copyBtn.classList.add('copied');
+                
+                setTimeout(() => {
+                    copyBtn.textContent = '📋 結果をコピー';
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            }
+        });
+    </script>
+</body>
+</html>
