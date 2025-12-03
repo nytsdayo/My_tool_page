@@ -140,6 +140,19 @@
             box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.2);
         }
 
+        .nav-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+
         @media (max-width: 480px) {
             .container {
                 padding: 20px;
@@ -190,6 +203,8 @@
             <h3>認識結果:</h3>
             <p id="result">ここに認識結果が表示されます...</p><span id="interim" style="color: #999;"></span>
         </div>
+
+        <a href="text-cleaner.html" class="nav-link">🧹 テキストクリーナーへ</a>
     </div>
 
     <script>
