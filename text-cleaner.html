@@ -244,9 +244,9 @@
          * @returns {string} - クリーンなテキスト
          */
         function cleanText(text) {
-            // |に続くカタカナ（長音符ーを含む）を除去
+            // |に続くカタカナ（長音符ー、小文字、繰り返し記号を含む）を除去
             // パターン: |[カタカナ]+ を空文字に置換
-            const cleaned = text.replace(/\|[ァ-ヶー]+/g, '');
+            const cleaned = text.replace(/\|[\u30A0-\u30FF]+/g, '');
             return cleaned;
         }
 
