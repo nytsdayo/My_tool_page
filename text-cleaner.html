@@ -199,13 +199,13 @@
     <div class="container">
         <h1>🧹 テキストクリーナー</h1>
         <p class="description">
-            音声認識結果からカタカナのルビと区切り文字（|）を除去します
+            音声認識結果からカタカナのルビ、区切り文字（|）、カンマ、タイムスタンプを除去し、行末に句読点を追加します
         </p>
 
         <div class="example">
             <h4>📝 使用例:</h4>
             <p class="example-text input-example">入力: 今|イマから|カラえっと|エットあの|アノ卒論|ソツロンの|ノ</p>
-            <p class="example-text output-example">出力: 今からえっとあの卒論の</p>
+            <p class="example-text output-example">出力: 今からえっとあの卒論の。</p>
         </div>
 
         <div class="input-section">
@@ -238,16 +238,36 @@
         const copyBtn = document.getElementById('copyBtn');
 
         /**
-         * テキストからカタカナと「|」を除去する
-         * パターン: |カタカナ を除去
+         * テキストからカタカナ、「|」、「,」、タイムスタンプを除去し、各行末に句読点を追加する
          * @param {string} text - 入力テキスト
          * @returns {string} - クリーンなテキスト
          */
         function cleanText(text) {
-            // |に続くカタカナ（長音符ー、小文字、繰り返し記号を含む）を除去
-            // パターン: |[カタカナ]+ を空文字に置換
-            const cleaned = text.replace(/\|[\u30A0-\u30FF]+/g, '');
-            return cleaned;
+            // 行ごとに処理
+            const lines = text.split('\n');
+            const cleanedLines = lines.map(line => {
+                // タイムスタンプ行（HH:MM:SS形式）を除去
+                if (/^\d{1,2}:\d{2}:\d{2}\s*$/.test(line.trim())) {
+                    return '';
+                }
+
+                // |に続くカタカナ（長音符ー、小文字、繰り返し記号を含む）を除去
+                let cleaned = line.replace(/\|[\u30A0-\u30FF]+/g, '');
+
+                // ,に続くカタカナを除去し、残りのカンマも除去
+                cleaned = cleaned.replace(/,[\u30A0-\u30FF]*/g, '');
+
+                // 行末に句読点を追加（空行でなく、既に句読点がない場合）
+                const trimmed = cleaned.trim();
+                if (trimmed && !/[。、！？!?]$/.test(trimmed)) {
+                    cleaned = trimmed + '。';
+                }
+
+                return cleaned;
+            });
+
+            // 空行を除去して結合
+            return cleanedLines.filter(line => line.trim() !== '').join('\n');
         }
 
         // 変換ボタン
