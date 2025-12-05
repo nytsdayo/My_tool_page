@@ -97,7 +97,6 @@ jobs:
       - name: Generate README
         if: steps.extract_info.outputs.info_extracted == 'true'
         run: |
-          chmod +x .github/scripts/generate-readme.js
           node .github/scripts/generate-readme.js
 
       - name: Commit and push changes
