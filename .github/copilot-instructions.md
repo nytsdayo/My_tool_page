@@ -19,7 +19,12 @@ This is a simple voice input web page that uses the Web Speech API for speech-to
 
 ## File Structure
 
-- `index.html` - Main HTML file containing all the code (HTML, CSS, and JavaScript)
+- `index.html` - Main HTML file
+- `styles.css` - Main page styles
+- `voice-input/index.html` - Voice input page HTML
+- `voice-input/style.css` - Voice input page styles
+- `voice-input/text-cleaner.html` - Text cleaner page HTML
+- `voice-input/text-cleaner.css` - Text cleaner page styles
 - `.github/workflows/deploy.yml` - GitHub Actions workflow for deploying to GitHub Pages
 - `README.md` - Project documentation
 
@@ -27,7 +32,7 @@ This is a simple voice input web page that uses the Web Speech API for speech-to
 
 When making changes to this project:
 
-1. **Keep it simple**: This is a single-file web application. Maintain the simplicity unless there's a strong reason to split files.
+1. **Separated structure**: HTML and CSS are now separated into different files. Keep this separation when making changes.
 
 2. **Browser compatibility**: Ensure changes work in Chrome, Edge, and Safari. The Web Speech API has varying support across browsers.
 
@@ -47,16 +52,16 @@ Since this is a static HTML page:
 ## Common Tasks
 
 ### Adding new features
-1. Add HTML elements in the container div
-2. Add CSS styles in the `<style>` section
-3. Add JavaScript in the `<script>` section
+1. Add HTML elements in the appropriate HTML file
+2. Add CSS styles in the corresponding CSS file
+3. Add JavaScript in the `<script>` section of the HTML file
 
-### Fixing voice recognition issues
-- Check the `recognition` object settings
-- Verify browser compatibility
-- Test error handling in `recognition.addEventListener('error', ...)`
-
-### UI improvements
-- Modify CSS in the `<style>` section
+### Styling changes
+- Modify the appropriate CSS file (styles.css, style.css, or text-cleaner.css)
 - Ensure changes work with the existing gradient theme
 - Test responsive behavior on different screen sizes
+
+### Fixing voice recognition issues
+- Check the `recognition` object settings in the JavaScript
+- Verify browser compatibility
+- Test error handling in `recognition.addEventListener('error', ...)`
