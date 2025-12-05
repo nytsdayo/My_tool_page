@@ -1,3 +1,13 @@
+# このワークフローは、HTMLファイルが変更されたときに自動的にREADME.mdを更新します。
+# 
+# 動作:
+# 1. main ブランチへの HTML ファイルの変更を検出
+# 2. すべての HTML ファイルから情報を抽出（タイトル、説明、アイコン）
+# 3. 抽出した情報から README.md を生成
+# 4. 変更があれば自動的に commit & push
+#
+# 参考: .github/scripts/generate-readme.js で README の内容を生成しています
+
 name: Update README on Page Changes
 
 on:
