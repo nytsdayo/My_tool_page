@@ -114,9 +114,12 @@ jobs:
               const pathParts = page.path.split('/');
               let category = 'root';
               
-              if (pathParts.length > 2) {
-                category = pathParts[1];
-              } else if (pathParts[1] === 'index.html') {
+              // Find the main directory (42, voice-input, etc.)
+              if (pathParts.includes('voice-input')) {
+                category = 'voice-input';
+              } else if (pathParts.includes('42')) {
+                category = '42';
+              } else if (pathParts[pathParts.length - 1] === 'index.html') {
                 return; // Skip root index.html
               }
               
@@ -129,11 +132,10 @@ jobs:
             // Add voice-input tools
             if (pagesByDir['voice-input']) {
               pagesByDir['voice-input'].forEach(page => {
-                const icon = page.icon || '🔧';
                 const fileName = page.path.split('/').pop();
                 
                 if (fileName === 'index.html') {
-                  readme += `### ${icon} 音声入力ページ\n`;
+                  readme += `### 🎤 音声入力ページ\n`;
                   readme += `音声入力ができるシンプルなWebページです。\n\n`;
                 } else if (fileName === 'text-cleaner.html') {
                   readme += `### 🧹 テキストクリーナー\n`;
@@ -145,8 +147,9 @@ jobs:
             // Add 42 tools
             if (pagesByDir['42']) {
               pagesByDir['42'].forEach(page => {
-                const icon = page.icon || '📚';
-                const dirName = page.path.split('/')[2];
+                const pathParts = page.path.split('/');
+                const dirIndex = pathParts.indexOf('42');
+                const dirName = dirIndex >= 0 && dirIndex + 1 < pathParts.length ? pathParts[dirIndex + 1] : '';
                 
                 if (dirName === 'ft_review_templete') {
                   readme += `### 📝 42レビュー用テンプレート\n`;
@@ -206,6 +209,10 @@ jobs:
 │       └── index.html      # minilibX日本語マニュアル
 └── README.md
 \`\`\`
+
+---
+
+*このREADMEは、HTMLファイルの変更時に自動的に更新されます。*
 `;
             
             // Write the new README
