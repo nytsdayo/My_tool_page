@@ -1,0 +1,126 @@
+# このワークフローは、HTMLファイルが変更されたときに自動的にREADME.mdを更新します。
+# 
+# 動作:
+# 1. main ブランチへの HTML ファイルの変更を検出
+# 2. すべての HTML ファイルから情報を抽出（タイトル、説明、アイコン）
+# 3. 抽出した情報から README.md を生成
+# 4. 変更があれば自動的に commit & push
+#
+# 参考: .github/scripts/generate-readme.js で README の内容を生成しています
+
+name: Update README on Page Changes
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - '**.html'
+      - '!README.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for HTML changes
+        id: check_changes
+        run: |
+          # Get the list of changed HTML files in the last commit
+          CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r HEAD | grep '\.html$' || true)
+          echo "Changed HTML files:"
+          echo "$CHANGED_FILES"
+
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "changed_files<<EOF" >> $GITHUB_OUTPUT
+            echo "$CHANGED_FILES" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Extract page information
+        id: extract_info
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          # Find all HTML files (excluding templates and fragments)
+          echo "Extracting information from HTML files..."
+
+          # Create a JSON structure with page information
+          echo '{"pages":[' > pages_info.json
+          first=true
+
+          for html_file in $(find . -name "*.html" -not -path "./.git/*" | sort); do
+            # Extract title
+            title=$(grep -oP '<title>\K[^<]+' "$html_file" 2>/dev/null || echo "")
+
+            # Extract description from meta tag or first h1
+            description=$(grep -oP '<meta name="description" content="\K[^"]+' "$html_file" 2>/dev/null || \
+                         grep -oP '<h1[^>]*>\K[^<]+' "$html_file" 2>/dev/null | head -1 || \
+                         grep -oP '<p class="description">\K[^<]+' "$html_file" 2>/dev/null | head -1 || \
+                         grep -oP '<p class="tool-description">\K[^<]+' "$html_file" 2>/dev/null | head -1 || \
+                         echo "")
+
+            # Get icon if exists
+            icon=$(grep -oP '<span class="tool-icon">\K[^<]+' "$html_file" 2>/dev/null | head -1 || echo "")
+
+            # Skip if no title found
+            if [ -n "$title" ]; then
+              if [ "$first" = false ]; then
+                echo "," >> pages_info.json
+              fi
+              first=false
+
+              # Create JSON object
+              jq -n \
+                --arg path "$html_file" \
+                --arg title "$title" \
+                --arg description "$description" \
+                --arg icon "$icon" \
+                '{path: $path, title: $title, description: $description, icon: $icon}' >> pages_info.json
+            fi
+          done
+
+          echo ']}' >> pages_info.json
+
+          echo "Pages information extracted:"
+          cat pages_info.json
+
+          # Set output flag
+          echo "info_extracted=true" >> $GITHUB_OUTPUT
+
+      - name: Setup Node.js
+        if: steps.extract_info.outputs.info_extracted == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Generate README
+        if: steps.extract_info.outputs.info_extracted == 'true'
+        run: |
+          node .github/scripts/generate-readme.js
+
+      - name: Commit and push changes
+        if: steps.extract_info.outputs.info_extracted == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Check if README.md has changes
+          if git diff --quiet README.md; then
+            echo "No changes to README.md"
+            exit 0
+          fi
+
+          git add README.md
+          git commit -m "docs: 自動更新 - README.mdをページ内容に基づいて更新"
+          git push
