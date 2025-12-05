@@ -1,0 +1,36 @@
+body {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+.tabs {
+    display: flex;
+    margin-bottom: 20px;
+}
+.tab {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    background-color: #f1f1f1;
+    border: 1px solid #ccc;
+}
+.tab.active {
+    background-color: #ddd;
+    font-weight: bold;
+}
+#template-text {
+    width: 100%;
+    min-height: 400px;
+    margin: 20px 0;
+    padding: 10px;
+    font-family: monospace;
+    white-space: pre-wrap;
+}
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-right: 10px;
+}
