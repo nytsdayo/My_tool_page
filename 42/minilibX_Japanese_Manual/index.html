@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MinilibX Man Pages (日本語訳)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* カスタムスクロールバー */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555; 
+        }
+        
+        /* コードブロックのスタイル調整 */
+        .code-block {
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+        }
+        
+        /* アンカーのオフセット（ヘッダー被り防止） */
+        section {
+            scroll-margin-top: 2rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans leading-relaxed">
+
+    <div class="flex flex-col md:flex-row min-h-screen">
+        
+        <!-- サイドバーナビゲーション -->
+        <nav class="bg-gray-900 text-gray-300 w-full md:w-72 flex-shrink-0 md:h-screen md:sticky md:top-0 overflow-y-auto p-6 shadow-lg">
+            <h1 class="text-white text-xl font-bold mb-6 border-b border-gray-700 pb-2">MLX Man Pages</h1>
+            
+            <div class="space-y-6 text-sm">
+                <!-- カテゴリ: 基本 -->
+                <div>
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Basic / Setup</h3>
+                    <ul class="space-y-1">
+                        <li><a href="#mlx_init" class="block hover:text-white hover:bg-gray-800 px-2 py-1 rounded transition">mlx_init</a></li>
+                        <li><a href="#mlx_new_window" class="block hover:text-white hover:bg-gray-800 px-2 py-1 rounded transition">mlx_new_window</a></li>
+                        <li><a href="#mlx_clear_window" class="block hover:text-white hover:bg-gray-800 px-2 py-1 rounded transition">mlx_clear_window</a></li>
+                        <li><a href="#mlx_destroy_window" class="block hover:text-white hover:bg-gray-800 px-2 py-1 rounded transition">mlx_destroy_window</a></li>
+                        <li><a href="#mlx_destroy_display" class="block hover:text-white hover:bg-gray-800 px-2 py-1 rounded transition">mlx_destroy_display</a></li>
+                    </ul>
+                </div>
+
+                <!-- カテゴリ: ループ・イベント -->
+                <div>
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Loop & Events</h3>
+                    <ul class="space-y-1">
+                        <li><a href="#mlx_loop" class="block hover:text-white hover:bg-gray-800 px-2 py-1 rounded transition">mlx_loop</a></li>
+                        <li><a href="#mlx_loop_end" class="block hover:text-white hover:bg-gray-800 px-2 py-1 rounded transition">mlx_loop_end</a></li>
+                        <li><a href="#mlx_loop_hook" class="block hover:text-white hover:bg-gray-800 px-2 py-1 rounded transition">mlx_loop_hook</a></li>
+                        <li><a href="#mlx_hook" class="block hover:text-white hover:bg-gray-800 px-2 py-1 rounded transition">mlx_hook</a></li>
+                        <li><a href="#mlx_key_hook" class="block hover:text-white hover:bg-gray-800 px-2 py-1 rounded transition">mlx_key_hook</a></li>
+                        <li><a href="#mlx_mouse_hook" class="block hover:text-white hover:bg-gray-800 px-2 py-1 rounded transition">mlx_mouse_hook</a></li>
+                        <li><a href="#mlx_expose_hook" class="block hover:text-white hover:bg-gray-800 px-2 py-1 rounded transition">mlx_expose_hook</a></li>
+                    </ul>
+                </div>
+
+                <!-- カテゴリ: 描画・画像 -->
+                <div>
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Drawing & Images</h3>
+                    <ul class="space-y-1">
+                        <li><a href="#mlx_new_image" class="block hover:text-white hover:bg-gray-800 px-2 py-1 rounded transition">mlx_new_image</a></li>
+                        <li><a href="#mlx_put_image_to_window" class="block hover:text-white hover:bg-gray-800 px-2 py-1 rounded transition">mlx_put_image_to_window</a></li>
+                        <li><a href="#mlx_get_data_addr" class="block hover:text-white hover:bg-gray-800 px-2 py-1 rounded transition">mlx_get_data_addr</a></li>
+                        <li><a href="#mlx_pixel_put" class="block hover:text-white hover:bg-gray-800 px-2 py-1 rounded transition">mlx_pixel_put</a></li>
+                        <li><a href="#mlx_string_put" class="block hover:text-white hover:bg-gray-800 px-2 py-1 rounded transition">mlx_string_put</a></li>
+                        <li><a href="#mlx_xpm_to_image" class="block hover:text-white hover:bg-gray-800 px-2 py-1 rounded transition">mlx_xpm_to_image</a></li>
+                        <li><a href="#mlx_xpm_file_to_image" class="block hover:text-white hover:bg-gray-800 px-2 py-1 rounded transition">mlx_xpm_file_to_image</a></li>
+                        <li><a href="#mlx_png_file_to_image" class="block hover:text-white hover:bg-gray-800 px-2 py-1 rounded transition">mlx_png_file_to_image</a></li>
+                        <li><a href="#mlx_destroy_image" class="block hover:text-white hover:bg-gray-800 px-2 py-1 rounded transition">mlx_destroy_image</a></li>
+                    </ul>
+                </div>
+
+                <!-- カテゴリ: ユーティリティ -->
+                <div>
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Utils & Others</h3>
+                    <ul class="space-y-1">
+                        <li><a href="#mlx_get_screen_size" class="block hover:text-white hover:bg-gray-800 px-2 py-1 rounded transition">mlx_get_screen_size</a></li>
+                        <li><a href="#mlx_get_color_value" class="block hover:text-white hover:bg-gray-800 px-2 py-1 rounded transition">mlx_get_color_value</a></li>
+                        <li><a href="#mlx_mouse_get_pos" class="block hover:text-white hover:bg-gray-800 px-2 py-1 rounded transition">mlx_mouse_get_pos</a></li>
+                        <li><a href="#mlx_mouse_move" class="block hover:text-white hover:bg-gray-800 px-2 py-1 rounded transition">mlx_mouse_move</a></li>
+                        <li><a href="#mlx_mouse_hide" class="block hover:text-white hover:bg-gray-800 px-2 py-1 rounded transition">mlx_mouse_hide</a></li>
+                        <li><a href="#mlx_mouse_show" class="block hover:text-white hover:bg-gray-800 px-2 py-1 rounded transition">mlx_mouse_show</a></li>
+                        <li><a href="#mlx_do_sync" class="block hover:text-white hover:bg-gray-800 px-2 py-1 rounded transition">mlx_do_sync</a></li>
+                        <li><a href="#mlx_set_window_title" class="block hover:text-white hover:bg-gray-800 px-2 py-1 rounded transition">mlx_set_window_title</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- メインコンテンツ -->
+        <main class="flex-1 p-8 md:p-12 max-w-4xl mx-auto w-full">
+            
+            <!-- MLX_INIT -->
+            <section id="mlx_init" class="mb-16 border-b border-gray-200 pb-10">
+                <header class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">mlx_init</h2>
+                    <p class="text-sm text-gray-500 font-mono">Setup</p>
+                </header>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">概要</h3>
+                        <div class="bg-gray-800 text-gray-100 p-4 rounded-md code-block overflow-x-auto shadow-inner">
+                            <pre>void *mlx_init(void);</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">説明</h3>
+                        <p class="leading-relaxed text-gray-700">MiniLibXの初期化を行います。描画を開始するための内部データとコンテキストを作成します。</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">戻り値</h3>
+                        <p class="text-gray-700">成功時にMiniLibXの識別子（ポインタ）を返します。失敗時はNULL。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MLX_NEW_WINDOW -->
+            <section id="mlx_new_window" class="mb-16 border-b border-gray-200 pb-10">
+                <header class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">mlx_new_window</h2>
+                    <p class="text-sm text-gray-500 font-mono">Setup</p>
+                </header>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">概要</h3>
+                        <div class="bg-gray-800 text-gray-100 p-4 rounded-md code-block overflow-x-auto shadow-inner">
+                            <pre>void *mlx_new_window(void *mlx_ptr, int size_x, int size_y, char *title);</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">引数</h3>
+                        <dl class="space-y-3">
+                            <div class="bg-white p-3 rounded border border-gray-200"><dt class="font-bold text-gray-900 font-mono">mlx_ptr</dt><dd class="text-gray-600 mt-1 pl-4">mlx_initで取得した識別子。</dd></div>
+                            <div class="bg-white p-3 rounded border border-gray-200"><dt class="font-bold text-gray-900 font-mono">size_x</dt><dd class="text-gray-600 mt-1 pl-4">ウィンドウの幅。</dd></div>
+                            <div class="bg-white p-3 rounded border border-gray-200"><dt class="font-bold text-gray-900 font-mono">size_y</dt><dd class="text-gray-600 mt-1 pl-4">ウィンドウの高さ。</dd></div>
+                            <div class="bg-white p-3 rounded border border-gray-200"><dt class="font-bold text-gray-900 font-mono">title</dt><dd class="text-gray-600 mt-1 pl-4">ウィンドウのタイトルバーに表示される文字列。</dd></div>
+                        </dl>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">戻り値</h3>
+                        <p class="text-gray-700">作成したウィンドウの識別子を返します。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MLX_CLEAR_WINDOW -->
+            <section id="mlx_clear_window" class="mb-16 border-b border-gray-200 pb-10">
+                <header class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">mlx_clear_window</h2>
+                    <p class="text-sm text-gray-500 font-mono">Window</p>
+                </header>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">概要</h3>
+                        <div class="bg-gray-800 text-gray-100 p-4 rounded-md code-block overflow-x-auto shadow-inner">
+                            <pre>int mlx_clear_window(void *mlx_ptr, void *win_ptr);</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">説明</h3>
+                        <p class="leading-relaxed text-gray-700">指定したウィンドウの内容をクリア（黒で塗りつぶし）します。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MLX_DESTROY_WINDOW -->
+            <section id="mlx_destroy_window" class="mb-16 border-b border-gray-200 pb-10">
+                <header class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">mlx_destroy_window</h2>
+                    <p class="text-sm text-gray-500 font-mono">Window</p>
+                </header>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">概要</h3>
+                        <div class="bg-gray-800 text-gray-100 p-4 rounded-md code-block overflow-x-auto shadow-inner">
+                            <pre>int mlx_destroy_window(void *mlx_ptr, void *win_ptr);</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">説明</h3>
+                        <p class="leading-relaxed text-gray-700">ウィンドウを破棄し、関連するリソースを解放します。</p>
+                    </div>
+                </div>
+            </section>
+
+             <!-- MLX_DESTROY_DISPLAY -->
+             <section id="mlx_destroy_display" class="mb-16 border-b border-gray-200 pb-10">
+                <header class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">mlx_destroy_display</h2>
+                    <p class="text-sm text-gray-500 font-mono">Setup</p>
+                </header>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">概要</h3>
+                        <div class="bg-gray-800 text-gray-100 p-4 rounded-md code-block overflow-x-auto shadow-inner">
+                            <pre>void mlx_destroy_display(void *mlx_ptr);</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">説明</h3>
+                        <p class="leading-relaxed text-gray-700">ディスプレイ接続を破棄します（Linux/X11環境等で重要）。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MLX_LOOP -->
+            <section id="mlx_loop" class="mb-16 border-b border-gray-200 pb-10">
+                <header class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">mlx_loop</h2>
+                    <p class="text-sm text-gray-500 font-mono">Loop</p>
+                </header>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">概要</h3>
+                        <div class="bg-gray-800 text-gray-100 p-4 rounded-md code-block overflow-x-auto shadow-inner">
+                            <pre>int mlx_loop(void *mlx_ptr);</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">説明</h3>
+                        <p class="leading-relaxed text-gray-700">イベントループを開始します。この関数は無限ループに入り、イベントが発生するたびに登録されたフック関数を呼び出します。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MLX_LOOP_END -->
+            <section id="mlx_loop_end" class="mb-16 border-b border-gray-200 pb-10">
+                <header class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">mlx_loop_end</h2>
+                    <p class="text-sm text-gray-500 font-mono">Loop</p>
+                </header>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">概要</h3>
+                        <div class="bg-gray-800 text-gray-100 p-4 rounded-md code-block overflow-x-auto shadow-inner">
+                            <pre>int mlx_loop_end(void *mlx_ptr);</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">説明</h3>
+                        <p class="leading-relaxed text-gray-700">イベントループを終了させます。</p>
+                    </div>
+                </div>
+            </section>
+
+             <!-- MLX_LOOP_HOOK -->
+             <section id="mlx_loop_hook" class="mb-16 border-b border-gray-200 pb-10">
+                <header class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">mlx_loop_hook</h2>
+                    <p class="text-sm text-gray-500 font-mono">Hooks</p>
+                </header>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">概要</h3>
+                        <div class="bg-gray-800 text-gray-100 p-4 rounded-md code-block overflow-x-auto shadow-inner">
+                            <pre>int mlx_loop_hook(void *mlx_ptr, int (*funct_ptr)(), void *param);</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">説明</h3>
+                        <p class="leading-relaxed text-gray-700">イベントが発生していない時に繰り返し呼び出される関数を登録します。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MLX_HOOK -->
+            <section id="mlx_hook" class="mb-16 border-b border-gray-200 pb-10">
+                <header class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">mlx_hook</h2>
+                    <p class="text-sm text-gray-500 font-mono">Hooks</p>
+                </header>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">概要</h3>
+                        <div class="bg-gray-800 text-gray-100 p-4 rounded-md code-block overflow-x-auto shadow-inner">
+                            <pre>int mlx_hook(void *win_ptr, int x_event, int x_mask, int (*funct)(), void *param);</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">引数</h3>
+                        <dl class="space-y-3">
+                            <div class="bg-white p-3 rounded border border-gray-200"><dt class="font-bold text-gray-900 font-mono">x_event</dt><dd class="text-gray-600 mt-1 pl-4">X11イベントコード（例: KeyPress=2, DestroyNotify=17）。</dd></div>
+                            <div class="bg-white p-3 rounded border border-gray-200"><dt class="font-bold text-gray-900 font-mono">x_mask</dt><dd class="text-gray-600 mt-1 pl-4">イベントマスク（通常は0または該当マスク）。</dd></div>
+                            <div class="bg-white p-3 rounded border border-gray-200"><dt class="font-bold text-gray-900 font-mono">funct</dt><dd class="text-gray-600 mt-1 pl-4">呼び出されるコールバック関数。</dd></div>
+                        </dl>
+                    </div>
+                </div>
+            </section>
+
+             <!-- MLX_KEY_HOOK -->
+             <section id="mlx_key_hook" class="mb-16 border-b border-gray-200 pb-10">
+                <header class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">mlx_key_hook</h2>
+                    <p class="text-sm text-gray-500 font-mono">Hooks</p>
+                </header>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">概要</h3>
+                        <div class="bg-gray-800 text-gray-100 p-4 rounded-md code-block overflow-x-auto shadow-inner">
+                            <pre>int mlx_key_hook(void *win_ptr, int (*funct_ptr)(), void *param);</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">説明</h3>
+                        <p class="leading-relaxed text-gray-700">キーボード入力イベント（KeyPress）に対するフック関数を設定します。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MLX_MOUSE_HOOK -->
+            <section id="mlx_mouse_hook" class="mb-16 border-b border-gray-200 pb-10">
+                <header class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">mlx_mouse_hook</h2>
+                    <p class="text-sm text-gray-500 font-mono">Hooks</p>
+                </header>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">概要</h3>
+                        <div class="bg-gray-800 text-gray-100 p-4 rounded-md code-block overflow-x-auto shadow-inner">
+                            <pre>int mlx_mouse_hook(void *win_ptr, int (*funct_ptr)(), void *param);</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">説明</h3>
+                        <p class="leading-relaxed text-gray-700">マウスボタンクリック時のイベントフックを設定します。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MLX_EXPOSE_HOOK -->
+            <section id="mlx_expose_hook" class="mb-16 border-b border-gray-200 pb-10">
+                <header class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">mlx_expose_hook</h2>
+                    <p class="text-sm text-gray-500 font-mono">Hooks</p>
+                </header>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">概要</h3>
+                        <div class="bg-gray-800 text-gray-100 p-4 rounded-md code-block overflow-x-auto shadow-inner">
+                            <pre>int mlx_expose_hook(void *win_ptr, int (*funct_ptr)(), void *param);</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">説明</h3>
+                        <p class="leading-relaxed text-gray-700">ウィンドウの再描画が必要になった時（Exposeイベント）に呼ばれるフックを設定します。</p>
+                    </div>
+                </div>
+            </section>
+
+             <!-- MLX_NEW_IMAGE -->
+             <section id="mlx_new_image" class="mb-16 border-b border-gray-200 pb-10">
+                <header class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">mlx_new_image</h2>
+                    <p class="text-sm text-gray-500 font-mono">Images</p>
+                </header>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">概要</h3>
+                        <div class="bg-gray-800 text-gray-100 p-4 rounded-md code-block overflow-x-auto shadow-inner">
+                            <pre>void *mlx_new_image(void *mlx_ptr, int width, int height);</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">説明</h3>
+                        <p class="leading-relaxed text-gray-700">指定したサイズの新しい画像をメモリ上に作成します。</p>
+                    </div>
+                </div>
+            </section>
+
+             <!-- MLX_PUT_IMAGE_TO_WINDOW -->
+             <section id="mlx_put_image_to_window" class="mb-16 border-b border-gray-200 pb-10">
+                <header class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">mlx_put_image_to_window</h2>
+                    <p class="text-sm text-gray-500 font-mono">Drawing</p>
+                </header>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">概要</h3>
+                        <div class="bg-gray-800 text-gray-100 p-4 rounded-md code-block overflow-x-auto shadow-inner">
+                            <pre>int mlx_put_image_to_window(void *mlx_ptr, void *win_ptr, void *img_ptr, int x, int y);</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">説明</h3>
+                        <p class="leading-relaxed text-gray-700">メモリ上の画像をウィンドウの指定座標(x, y)に描画します。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MLX_GET_DATA_ADDR -->
+            <section id="mlx_get_data_addr" class="mb-16 border-b border-gray-200 pb-10">
+                <header class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">mlx_get_data_addr</h2>
+                    <p class="text-sm text-gray-500 font-mono">Images</p>
+                </header>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">概要</h3>
+                        <div class="bg-gray-800 text-gray-100 p-4 rounded-md code-block overflow-x-auto shadow-inner">
+                            <pre>char *mlx_get_data_addr(void *img_ptr, int *bits_per_pixel, int *size_line, int *endian);</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">説明</h3>
+                        <p class="leading-relaxed text-gray-700">画像のピクセルデータへのポインタを取得します。直接ピクセルを操作する場合に使用します。</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">引数</h3>
+                        <dl class="space-y-3">
+                            <div class="bg-white p-3 rounded border border-gray-200"><dt class="font-bold text-gray-900 font-mono">bits_per_pixel</dt><dd class="text-gray-600 mt-1 pl-4">1ピクセルあたりのビット数（通常32）。</dd></div>
+                            <div class="bg-white p-3 rounded border border-gray-200"><dt class="font-bold text-gray-900 font-mono">size_line</dt><dd class="text-gray-600 mt-1 pl-4">画像の1行あたりのバイト数。</dd></div>
+                            <div class="bg-white p-3 rounded border border-gray-200"><dt class="font-bold text-gray-900 font-mono">endian</dt><dd class="text-gray-600 mt-1 pl-4">ピクセルデータのエンディアン。</dd></div>
+                        </dl>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MLX_PIXEL_PUT -->
+            <section id="mlx_pixel_put" class="mb-16 border-b border-gray-200 pb-10">
+                <header class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">mlx_pixel_put</h2>
+                    <p class="text-sm text-gray-500 font-mono">Drawing</p>
+                </header>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">概要</h3>
+                        <div class="bg-gray-800 text-gray-100 p-4 rounded-md code-block overflow-x-auto shadow-inner">
+                            <pre>int mlx_pixel_put(void *mlx_ptr, void *win_ptr, int x, int y, int color);</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">説明</h3>
+                        <p class="leading-relaxed text-gray-700">ウィンドウに直接ピクセルを描画します。動作が遅いため、通常は画像を作成して操作する方法が推奨されます。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MLX_STRING_PUT -->
+            <section id="mlx_string_put" class="mb-16 border-b border-gray-200 pb-10">
+                <header class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">mlx_string_put</h2>
+                    <p class="text-sm text-gray-500 font-mono">Drawing</p>
+                </header>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">概要</h3>
+                        <div class="bg-gray-800 text-gray-100 p-4 rounded-md code-block overflow-x-auto shadow-inner">
+                            <pre>int mlx_string_put(void *mlx_ptr, void *win_ptr, int x, int y, int color, char *string);</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">説明</h3>
+                        <p class="leading-relaxed text-gray-700">ウィンドウに文字列を描画します。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MLX_XPM_TO_IMAGE -->
+            <section id="mlx_xpm_to_image" class="mb-16 border-b border-gray-200 pb-10">
+                <header class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">mlx_xpm_to_image</h2>
+                    <p class="text-sm text-gray-500 font-mono">Images</p>
+                </header>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">概要</h3>
+                        <div class="bg-gray-800 text-gray-100 p-4 rounded-md code-block overflow-x-auto shadow-inner">
+                            <pre>void *mlx_xpm_to_image(void *mlx_ptr, char **xpm_data, int *width, int *height);</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">説明</h3>
+                        <p class="leading-relaxed text-gray-700">XPM形式のデータ（文字列配列）から新しい画像を作成します。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MLX_XPM_FILE_TO_IMAGE -->
+            <section id="mlx_xpm_file_to_image" class="mb-16 border-b border-gray-200 pb-10">
+                <header class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">mlx_xpm_file_to_image</h2>
+                    <p class="text-sm text-gray-500 font-mono">Images</p>
+                </header>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">概要</h3>
+                        <div class="bg-gray-800 text-gray-100 p-4 rounded-md code-block overflow-x-auto shadow-inner">
+                            <pre>void *mlx_xpm_file_to_image(void *mlx_ptr, char *filename, int *width, int *height);</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">説明</h3>
+                        <p class="leading-relaxed text-gray-700">XPMファイルを読み込み、新しい画像を作成します。</p>
+                    </div>
+                </div>
+            </section>
+
+             <!-- MLX_PNG_FILE_TO_IMAGE -->
+             <section id="mlx_png_file_to_image" class="mb-16 border-b border-gray-200 pb-10">
+                <header class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">mlx_png_file_to_image</h2>
+                    <p class="text-sm text-gray-500 font-mono">Images</p>
+                </header>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">概要</h3>
+                        <div class="bg-gray-800 text-gray-100 p-4 rounded-md code-block overflow-x-auto shadow-inner">
+                            <pre>void *mlx_png_file_to_image(void *mlx_ptr, char *filename, int *width, int *height);</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">説明</h3>
+                        <p class="leading-relaxed text-gray-700">PNGファイルを読み込み、新しい画像を作成します（MLXのバージョンによっては非対応の場合あり）。</p>
+                    </div>
+                </div>
+            </section>
+
+             <!-- MLX_DESTROY_IMAGE -->
+             <section id="mlx_destroy_image" class="mb-16 border-b border-gray-200 pb-10">
+                <header class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">mlx_destroy_image</h2>
+                    <p class="text-sm text-gray-500 font-mono">Images</p>
+                </header>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">概要</h3>
+                        <div class="bg-gray-800 text-gray-100 p-4 rounded-md code-block overflow-x-auto shadow-inner">
+                            <pre>int mlx_destroy_image(void *mlx_ptr, void *img_ptr);</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">説明</h3>
+                        <p class="leading-relaxed text-gray-700">作成した画像を破棄し、メモリを解放します。</p>
+                    </div>
+                </div>
+            </section>
+
+             <!-- MLX_GET_SCREEN_SIZE -->
+             <section id="mlx_get_screen_size" class="mb-16 border-b border-gray-200 pb-10">
+                <header class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">mlx_get_screen_size</h2>
+                    <p class="text-sm text-gray-500 font-mono">Utils</p>
+                </header>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">概要</h3>
+                        <div class="bg-gray-800 text-gray-100 p-4 rounded-md code-block overflow-x-auto shadow-inner">
+                            <pre>void mlx_get_screen_size(void *mlx_ptr, int *sizex, int *sizey);</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">説明</h3>
+                        <p class="leading-relaxed text-gray-700">ディスプレイの解像度を取得します。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MLX_GET_COLOR_VALUE -->
+            <section id="mlx_get_color_value" class="mb-16 border-b border-gray-200 pb-10">
+                <header class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">mlx_get_color_value</h2>
+                    <p class="text-sm text-gray-500 font-mono">Utils</p>
+                </header>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">概要</h3>
+                        <div class="bg-gray-800 text-gray-100 p-4 rounded-md code-block overflow-x-auto shadow-inner">
+                            <pre>unsigned int mlx_get_color_value(void *mlx_ptr, int color);</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">説明</h3>
+                        <p class="leading-relaxed text-gray-700">ディスプレイの深度に合わせて色値を変換します。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MLX_MOUSE_GET_POS -->
+            <section id="mlx_mouse_get_pos" class="mb-16 border-b border-gray-200 pb-10">
+                <header class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">mlx_mouse_get_pos</h2>
+                    <p class="text-sm text-gray-500 font-mono">Utils</p>
+                </header>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">概要</h3>
+                        <div class="bg-gray-800 text-gray-100 p-4 rounded-md code-block overflow-x-auto shadow-inner">
+                            <pre>int mlx_mouse_get_pos(void *mlx_ptr, void *win_ptr, int *x, int *y);</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">説明</h3>
+                        <p class="leading-relaxed text-gray-700">現在のマウスカーソルの座標を取得します。</p>
+                    </div>
+                </div>
+            </section>
+
+             <!-- MLX_MOUSE_MOVE -->
+             <section id="mlx_mouse_move" class="mb-16 border-b border-gray-200 pb-10">
+                <header class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">mlx_mouse_move</h2>
+                    <p class="text-sm text-gray-500 font-mono">Utils</p>
+                </header>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">概要</h3>
+                        <div class="bg-gray-800 text-gray-100 p-4 rounded-md code-block overflow-x-auto shadow-inner">
+                            <pre>int mlx_mouse_move(void *mlx_ptr, void *win_ptr, int x, int y);</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">説明</h3>
+                        <p class="leading-relaxed text-gray-700">マウスカーソルを指定した座標に移動させます。</p>
+                    </div>
+                </div>
+            </section>
+
+             <!-- MLX_MOUSE_HIDE -->
+             <section id="mlx_mouse_hide" class="mb-16 border-b border-gray-200 pb-10">
+                <header class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">mlx_mouse_hide</h2>
+                    <p class="text-sm text-gray-500 font-mono">Utils</p>
+                </header>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">概要</h3>
+                        <div class="bg-gray-800 text-gray-100 p-4 rounded-md code-block overflow-x-auto shadow-inner">
+                            <pre>int mlx_mouse_hide(void *mlx_ptr, void *win_ptr);</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">説明</h3>
+                        <p class="leading-relaxed text-gray-700">マウスカーソルを非表示にします。</p>
+                    </div>
+                </div>
+            </section>
+
+             <!-- MLX_MOUSE_SHOW -->
+             <section id="mlx_mouse_show" class="mb-16 border-b border-gray-200 pb-10">
+                <header class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">mlx_mouse_show</h2>
+                    <p class="text-sm text-gray-500 font-mono">Utils</p>
+                </header>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">概要</h3>
+                        <div class="bg-gray-800 text-gray-100 p-4 rounded-md code-block overflow-x-auto shadow-inner">
+                            <pre>int mlx_mouse_show(void *mlx_ptr, void *win_ptr);</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">説明</h3>
+                        <p class="leading-relaxed text-gray-700">マウスカーソルを表示します。</p>
+                    </div>
+                </div>
+            </section>
+
+             <!-- MLX_DO_SYNC -->
+             <section id="mlx_do_sync" class="mb-16 border-b border-gray-200 pb-10">
+                <header class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">mlx_do_sync</h2>
+                    <p class="text-sm text-gray-500 font-mono">Utils</p>
+                </header>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">概要</h3>
+                        <div class="bg-gray-800 text-gray-100 p-4 rounded-md code-block overflow-x-auto shadow-inner">
+                            <pre>void mlx_do_sync(void *mlx_ptr);</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">説明</h3>
+                        <p class="leading-relaxed text-gray-700">ディスプレイバッファを強制的に同期します。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MLX_SET_WINDOW_TITLE -->
+            <section id="mlx_set_window_title" class="mb-16">
+                <header class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">mlx_set_window_title</h2>
+                    <p class="text-sm text-gray-500 font-mono">Utils</p>
+                </header>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">概要</h3>
+                        <div class="bg-gray-800 text-gray-100 p-4 rounded-md code-block overflow-x-auto shadow-inner">
+                            <pre>void mlx_set_window_title(void *mlx_ptr, void *win_ptr, char *title);</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">説明</h3>
+                        <p class="leading-relaxed text-gray-700">ウィンドウのタイトルを変更します。</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+</body>
+</html>
