@@ -1,7 +1,7 @@
 const templates = [
-    `【PRAISE - 賞賛すべき点】\n\n【DISSCUSION - 議論】\n\n【MUST - 必須の修正点】\n\n【SUGGESTION - 改善策・アイデア提案（任意）】\n\n【NOTICE - 注意事項】\n\n【NOTE - 共有メモ】`,
+    `【PRAISE - 賞賛すべき点】\n\n【DISCUSSION - 議論】\n\n【MUST - 必須の修正点】\n\n【SUGGESTION - 改善策・アイデア提案（任意）】\n\n【NOTICE - 注意事項】\n\n【NOTE - 共有メモ】`,
 
-    `【PRAISE - 賞賛すべき点】\n\n【DISSCUSION - 議論】\n\n【MUST DESCRIBE - 説明が不足していた点】\n\n【KNOWREDGE TIPS - 知識の補足】\n\n【NOTICE - 注意事項】\n\n【NOTE - 共有メモ】`,
+    `【PRAISE - 賞賛すべき点】\n\n【DISCUSSION - 議論】\n\n【MUST DESCRIBE - 説明が不足していた点】\n\n【KNOWREDGE TIPS - 知識の補足】\n\n【NOTICE - 注意事項】\n\n【NOTE - 共有メモ】`,
 
     `【COMMENT - コメント】`
 ];
