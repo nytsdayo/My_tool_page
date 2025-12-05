@@ -78,6 +78,17 @@ h1 {
     line-height: 1.5;
 }
 
+.back-to-top-section {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.back-to-top-link {
+    color: #667eea;
+    text-decoration: none;
+    font-size: 1rem;
+}
+
 @media (max-width: 480px) {
     .container {
         padding: 20px;
