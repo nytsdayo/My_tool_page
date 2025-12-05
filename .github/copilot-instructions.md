@@ -31,7 +31,9 @@ This is a simple voice input web page that uses the Web Speech API for speech-to
 - `42/ft_review_templete/style.css` - 42 review template styles
 - `42/ft_review_templete/script.js` - 42 review template JavaScript
 - `.github/workflows/deploy.yml` - GitHub Actions workflow for deploying to GitHub Pages
-- `README.md` - Project documentation
+- `.github/workflows/update-readme.yml` - GitHub Actions workflow for auto-updating README.md
+- `.github/scripts/generate-readme.js` - Script to generate README.md from HTML files
+- `README.md` - Project documentation (automatically updated by workflow)
 
 ## Coding Guidelines
 
@@ -73,3 +75,14 @@ Since this is a static HTML page:
 - Check the `recognition` object settings in the JavaScript
 - Verify browser compatibility
 - Test error handling in `recognition.addEventListener('error', ...)`
+
+## Automated README Updates
+
+The repository includes an automated workflow that updates `README.md` when HTML files are modified:
+
+- **Trigger**: Runs when HTML files are pushed to the main branch
+- **Process**: 
+  1. Extracts information (title, description, icons) from all HTML files
+  2. Generates a new README.md using `.github/scripts/generate-readme.js`
+  3. Automatically commits and pushes the updated README if changes are detected
+- **Note**: When adding new HTML pages, the README will automatically include them in the next commit to main
