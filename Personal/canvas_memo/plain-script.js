@@ -1,5 +1,7 @@
 const canvas = document.getElementById("canvas");
 
+const FREEHAND_LONG_PRESS_MS = 300; // フリーハンド長押し時間（ミリ秒）
+
 const state = {
   draggingCard: null,
   dragOffset: { x: 0, y: 0 },
@@ -10,7 +12,7 @@ const state = {
   selectedCard: null,
   drawingFreehand: false,
   freehandPressTimer: null,
-  freehandLongPressThreshold: 300,
+  freehandLongPressThreshold: FREEHAND_LONG_PRESS_MS,
   currentPath: [],
   canvasData: {
     cards: [],

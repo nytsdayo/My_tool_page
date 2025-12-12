@@ -1,5 +1,8 @@
 const canvas = document.getElementById("canvas");
 
+const LINE_HEIGHT = 32; // 行の高さ（CSSのline-heightと一致）
+const MIN_DRAW_SIZE = 10; // 最小描画サイズ（誤クリック防止）
+
 const state = {
   canvasText: "",
   lines: [],
@@ -70,8 +73,7 @@ function render() {
   textarea.addEventListener("click", e => {
     const rect = textarea.getBoundingClientRect();
     const y = e.clientY - rect.top;
-    const lineHeight = 32; // CSSのline-heightと一致
-    const clickedLine = Math.floor(y / lineHeight);
+    const clickedLine = Math.floor(y / LINE_HEIGHT);
     
     // 現在の行数
     const currentLines = textarea.value.split('\n').length;
@@ -133,7 +135,7 @@ document.querySelectorAll('.tool-btn').forEach(btn => {
 
 // キャンバス上でのマウスイベント
 canvas.addEventListener('mousedown', (e) => {
-  if (state.currentTool && e.target.id === 'canvas') {
+  if (state.currentTool && (e.target === canvas || canvas.contains(e.target))) {
     state.isDrawing = true;
     const rect = canvas.getBoundingClientRect();
     state.drawStart = {
@@ -161,11 +163,10 @@ canvas.addEventListener('mouseup', (e) => {
     const height = Math.abs(endY - state.drawStart.y);
     
     // 最小サイズチェック（誤クリック防止）
-    if (width > 10 || height > 10) {
+    if (width > MIN_DRAW_SIZE || height > MIN_DRAW_SIZE) {
       if (state.currentTool === 'highlighter') {
         // 蛍光ペンは行の高さに合わせる
-        const lineHeight = 32;
-        const lineY = Math.floor(y / lineHeight) * lineHeight;
+        const lineY = Math.floor(y / LINE_HEIGHT) * LINE_HEIGHT;
         state.decorations.push({
           type: 'highlighter',
           x: x,
@@ -183,8 +184,7 @@ canvas.addEventListener('mouseup', (e) => {
         });
       } else if (state.currentTool === 'underline') {
         // 下線は行の下部に配置
-        const lineHeight = 32;
-        const lineY = Math.floor(y / lineHeight) * lineHeight + lineHeight - 3;
+        const lineY = Math.floor(y / LINE_HEIGHT) * LINE_HEIGHT + LINE_HEIGHT - 3;
         state.decorations.push({
           type: 'underline',
           x: x,
