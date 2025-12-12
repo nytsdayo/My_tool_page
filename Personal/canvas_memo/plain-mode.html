@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>Canvas Memo - 白紙モード</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="plain-style.css" />
+</head>
+<body>
+  <nav class="breadcrumb">
+    <a href="../../index.html">ホーム</a>
+    <span> / </span>
+    <a href="../index.html">Personal</a>
+    <span> / </span>
+    <span>Canvas Memo - 白紙</span>
+  </nav>
+
+  <div id="toolbar">
+    <div class="toolbar-section">
+      <span class="toolbar-label">ツール</span>
+      <button class="shape-btn" data-shape="circle">○</button>
+      <button class="shape-btn" data-shape="rect">□</button>
+      <button class="shape-btn" data-shape="rounded-rect">▢</button>
+      <button class="shape-btn" data-shape="ellipse">楕円</button>
+      <button class="shape-btn" data-shape="freehand">✏️</button>
+      <span class="toolbar-divider">|</span>
+      <button class="size-btn active" data-size="large">大</button>
+      <button class="size-btn" data-size="medium">中</button>
+      <button class="size-btn" data-size="small">小</button>
+      <span class="toolbar-divider">|</span>
+      <a href="lined-mode.html" class="mode-link">罫線モード</a>
+      <span class="toolbar-divider">|</span>
+      <button id="clear-btn" class="action-btn">クリア</button>
+    </div>
+  </div>
+
+  <div id="canvas-container">
+    <div id="canvas"></div>
+  </div>
+
+  <script src="plain-script.js"></script>
+
+</body>
+</html>
