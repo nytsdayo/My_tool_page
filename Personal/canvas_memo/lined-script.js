@@ -11,7 +11,11 @@ function getEventCoordinates(e) {
 const state = {
   canvasText: "",
   lines: [],
-  minLines: 35 // Canvas高さ1123px / 行高さ32px = 約35行
+  minLines: 35, // Canvas高さ1123px / 行高さ32px = 約35行
+  currentTool: null,
+  isDrawing: false,
+  drawStart: null,
+  decorations: []
 };
 
 function ensureMinimumLines(text) {
@@ -28,6 +32,19 @@ function ensureMinimumLines(text) {
 
 function render() {
   canvas.innerHTML = "";
+  
+  // デコレーションを描画
+  state.decorations.forEach(deco => {
+    const decoEl = document.createElement("div");
+    decoEl.className = `decoration ${deco.type}`;
+    decoEl.style.left = deco.x + "px";
+    decoEl.style.top = deco.y + "px";
+    decoEl.style.width = deco.width + "px";
+    if (deco.type === 'box') {
+      decoEl.style.height = deco.height + "px";
+    }
+    canvas.appendChild(decoEl);
+  });
   
   const textarea = document.createElement("textarea");
   textarea.id = "canvas-textarea";
@@ -103,7 +120,97 @@ document.getElementById('clear-btn').addEventListener('click', () => {
   if (confirm('すべての内容を削除してよろしいですか？')) {
     state.canvasText = "";
     state.lines = [];
+    state.decorations = [];
     render();
+  }
+});
+
+// ツールボタンのイベントリスナー
+document.querySelectorAll('.tool-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tool = btn.dataset.tool;
+    
+    // すでに選択されているツールをクリックした場合は解除
+    if (state.currentTool === tool) {
+      state.currentTool = null;
+      btn.classList.remove('active');
+      canvas.style.cursor = "text";
+    } else {
+      // 他のボタンのアクティブクラスを削除
+      document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+      
+      state.currentTool = tool;
+      btn.classList.add('active');
+      canvas.style.cursor = "crosshair";
+    }
+  });
+});
+
+// キャンバス上でのマウスイベント
+canvas.addEventListener('mousedown', (e) => {
+  if (state.currentTool && (e.target === canvas || canvas.contains(e.target))) {
+    state.isDrawing = true;
+    const rect = canvas.getBoundingClientRect();
+    state.drawStart = {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    };
+  }
+});
+
+canvas.addEventListener('mousemove', (e) => {
+  if (state.isDrawing && state.currentTool) {
+    // プレビュー表示（オプション）
+  }
+});
+
+canvas.addEventListener('mouseup', (e) => {
+  if (state.isDrawing && state.currentTool && state.drawStart) {
+    const rect = canvas.getBoundingClientRect();
+    const endX = e.clientX - rect.left;
+    const endY = e.clientY - rect.top;
+    
+    const x = Math.min(state.drawStart.x, endX);
+    const y = Math.min(state.drawStart.y, endY);
+    const width = Math.abs(endX - state.drawStart.x);
+    const height = Math.abs(endY - state.drawStart.y);
+    
+    // 最小サイズチェック（誤クリック防止）
+    if (width > MIN_DRAW_SIZE || height > MIN_DRAW_SIZE) {
+      if (state.currentTool === 'highlighter') {
+        // 蛍光ペンは行の高さに合わせる
+        const lineY = Math.floor(y / LINE_HEIGHT) * LINE_HEIGHT;
+        state.decorations.push({
+          type: 'highlighter',
+          x: x,
+          y: lineY,
+          width: width
+        });
+      } else if (state.currentTool === 'box') {
+        // 枠線
+        state.decorations.push({
+          type: 'box',
+          x: x,
+          y: y,
+          width: width,
+          height: height
+        });
+      } else if (state.currentTool === 'underline') {
+        // 下線は行の下部に配置
+        const lineY = Math.floor(y / LINE_HEIGHT) * LINE_HEIGHT + LINE_HEIGHT - 3;
+        state.decorations.push({
+          type: 'underline',
+          x: x,
+          y: lineY,
+          width: width
+        });
+      }
+      
+      render();
+    }
+    
+    state.isDrawing = false;
+    state.drawStart = null;
   }
 });
 

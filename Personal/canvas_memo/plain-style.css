@@ -104,6 +104,45 @@
   border-radius: 0;
 }
 
+/* 矢印スタイル */
+.card.shape-arrow {
+  border-radius: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+.card.shape-arrow textarea {
+  background: transparent;
+  pointer-events: none;
+  display: none;
+}
+
+.card.shape-arrow::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 20%;
+  height: 4px;
+  background: #3b82f6;
+  transform: translateY(-50%);
+}
+
+.card.shape-arrow::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-left: 20px solid #3b82f6;
+  border-top: 15px solid transparent;
+  border-bottom: 15px solid transparent;
+  transform: translateY(-50%);
+}
+
 button {
   padding: 4px 8px;
   border-radius: 6px;
