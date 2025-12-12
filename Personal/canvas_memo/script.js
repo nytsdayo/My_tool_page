@@ -270,25 +270,36 @@ window.addEventListener("mousemove", e => {
     const y = e.clientY - rect.top;
     state.currentPath.push({ x, y });
     
-    // リアルタイムでパスを描画
-    render();
+    // 一時パスのみを更新（render()は呼ばない）
     if (state.currentPath.length > 0) {
-      const svg = canvas.querySelector('.freehand-svg');
-      if (svg) {
-        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        let d = `M ${state.currentPath[0].x} ${state.currentPath[0].y}`;
-        for (let i = 1; i < state.currentPath.length; i++) {
-          d += ` L ${state.currentPath[i].x} ${state.currentPath[i].y}`;
-        }
-        path.setAttribute("d", d);
-        path.setAttribute("stroke", "#3b82f6");
-        path.setAttribute("stroke-width", "2");
-        path.setAttribute("fill", "none");
-        path.setAttribute("stroke-linecap", "round");
-        path.setAttribute("stroke-linejoin", "round");
-        path.setAttribute("opacity", "0.7");
-        svg.appendChild(path);
+      let svg = canvas.querySelector('.freehand-svg');
+      if (!svg) {
+        svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.classList.add("freehand-svg");
+        svg.setAttribute("width", "794");
+        svg.setAttribute("height", "1123");
+        canvas.appendChild(svg);
       }
+      
+      // 既存の一時パスを取得または作成
+      let tempPath = svg.querySelector('#temp-freehand-path');
+      if (!tempPath) {
+        tempPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        tempPath.setAttribute("id", "temp-freehand-path");
+        svg.appendChild(tempPath);
+      }
+      
+      let d = `M ${state.currentPath[0].x} ${state.currentPath[0].y}`;
+      for (let i = 1; i < state.currentPath.length; i++) {
+        d += ` L ${state.currentPath[i].x} ${state.currentPath[i].y}`;
+      }
+      tempPath.setAttribute("d", d);
+      tempPath.setAttribute("stroke", "#3b82f6");
+      tempPath.setAttribute("stroke-width", "2");
+      tempPath.setAttribute("fill", "none");
+      tempPath.setAttribute("stroke-linecap", "round");
+      tempPath.setAttribute("stroke-linejoin", "round");
+      tempPath.setAttribute("opacity", "0.7");
     }
     return;
   }
