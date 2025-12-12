@@ -9,9 +9,11 @@ const state = {
   resizingCard: null,
   resizeStart: { x: 0, y: 0, w: 0, h: 0, cardX: 0, cardY: 0 },
   resizeCorner: null,
+  currentTextSize: "small",
+  selectedCard: null,
   tree: {
     cards: [
-      { id: 1, x: 400, y: 120, w: 220, h: 120, text: "", shape: "rounded-rect" }
+      { id: 1, x: 400, y: 120, w: 180, h: 100, text: "", shape: "rounded-rect", textSize: "small" }
     ],
     connections: [],
     nextId: 2
@@ -24,16 +26,16 @@ function addCard(shape = "rounded-rect") {
 
   let x = 100 + Math.random() * 400;
   let y = 100 + Math.random() * 400;
-  let w = 220;
-  let h = 120;
+  let w = 180;
+  let h = 100;
 
   // 丸の場合は正方形に
   if (shape === "circle") {
-    w = 150;
-    h = 150;
+    w = 120;
+    h = 120;
   }
 
-  data.cards.push({ id, x, y, w, h, text: "", shape });
+  data.cards.push({ id, x, y, w, h, text: "", shape, textSize: state.currentTextSize });
   render();
 }
 
@@ -42,7 +44,10 @@ function render() {
 
   state.tree.cards.forEach(card => {
     const el = document.createElement("div");
-    el.className = `card shape-${card.shape}`;
+    el.className = `card shape-${card.shape} text-${card.textSize}`;
+    if (state.selectedCard === card) {
+      el.classList.add('selected');
+    }
     el.style.left = card.x + "px";
     el.style.top = card.y + "px";
     el.style.width = card.w + "px";
@@ -84,6 +89,10 @@ function render() {
         return;
       }
       
+      // カードを選択
+      state.selectedCard = card;
+      updateTextSizeButtons();
+      
       state.draggingCard = card;
       state.dragOffset = {
         x: e.clientX - card.x,
@@ -92,8 +101,27 @@ function render() {
       e.stopPropagation();
     });
 
+    // textareaクリック時もカードを選択
+    ta.addEventListener("mousedown", e => {
+      state.selectedCard = card;
+      updateTextSizeButtons();
+      render();
+    });
+
     el.appendChild(ta);
     canvas.appendChild(el);
+  });
+}
+
+// 文字サイズボタンの表示を更新
+function updateTextSizeButtons() {
+  document.querySelectorAll('.size-btn').forEach(btn => {
+    btn.classList.remove('active');
+    if (state.selectedCard && btn.dataset.size === state.selectedCard.textSize) {
+      btn.classList.add('active');
+    } else if (!state.selectedCard && btn.dataset.size === state.currentTextSize) {
+      btn.classList.add('active');
+    }
   });
 }
 
@@ -102,6 +130,23 @@ document.querySelectorAll('.shape-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const shape = btn.dataset.shape;
     addCard(shape);
+  });
+});
+
+// 文字サイズボタンのイベントリスナー
+document.querySelectorAll('.size-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const size = btn.dataset.size;
+    
+    // カードが選択されている場合は、そのカードの文字サイズを変更
+    if (state.selectedCard) {
+      state.selectedCard.textSize = size;
+      render();
+    }
+    
+    // デフォルトの文字サイズを更新（新規カード用）
+    state.currentTextSize = size;
+    updateTextSizeButtons();
   });
 });
 
@@ -145,6 +190,15 @@ window.addEventListener("mousemove", e => {
     state.draggingCard.y = e.clientY - state.dragOffset.y;
     render();
     return;
+  }
+});
+
+// キャンバスクリックで選択解除
+canvas.addEventListener("click", e => {
+  if (e.target === canvas) {
+    state.selectedCard = null;
+    updateTextSizeButtons();
+    render();
   }
 });
 

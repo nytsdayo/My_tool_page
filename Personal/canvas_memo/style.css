@@ -23,58 +23,53 @@ html, body {
   text-decoration: underline;
 }
 
-#main-content {
-  display: flex;
-  height: calc(100% - 45px);
-}
-
-#sidebar {
-  width: 200px;
+#toolbar {
   background: #ffffff;
-  border-right: 1px solid #e5e7eb;
-  padding: 16px;
-  overflow-y: auto;
-  box-shadow: 2px 0 4px rgba(0,0,0,0.05);
+  padding: 12px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
-#sidebar h3 {
-  margin: 0 0 16px 0;
-  font-size: 18px;
+.toolbar-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbar-label {
+  font-weight: 600;
+  font-size: 14px;
+  margin-right: 8px;
   color: #111827;
 }
 
-#sidebar h4 {
-  margin: 12px 0 8px 0;
-  font-size: 14px;
-  color: #6b7280;
-  font-weight: 500;
+.toolbar-divider {
+  color: #d1d5db;
+  margin: 0 4px;
 }
 
-.tool-section {
-  margin-bottom: 16px;
-}
-
-.shape-btn {
-  display: block;
-  width: 100%;
-  padding: 8px 12px;
-  margin-bottom: 6px;
+.shape-btn,
+.size-btn {
+  padding: 6px 16px;
   border-radius: 6px;
   border: 1px solid #d1d5db;
   background: #ffffff;
   cursor: pointer;
   font-size: 14px;
-  text-align: left;
   transition: all 0.2s;
+  min-width: 50px;
 }
 
-.shape-btn:hover {
+.shape-btn:hover,
+.size-btn:hover {
   background: #f3f4f6;
   border-color: #3b82f6;
 }
 
-.shape-btn:active {
-  background: #e5e7eb;
+.size-btn.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
 }
 
 #canvas-container {
@@ -85,6 +80,7 @@ html, body {
   justify-content: center;
   align-items: flex-start;
   padding: 40px 20px;
+  height: calc(100vh - 45px - 60px);
 }
 
 #canvas {
@@ -106,6 +102,11 @@ html, body {
   box-sizing: border-box;
   cursor: move;
   padding: 8px;
+  transition: box-shadow 0.2s;
+}
+
+.card.selected {
+  box-shadow: 0 0 0 3px #fbbf24, 0 4px 8px rgba(0,0,0,0.15);
 }
 
 .card textarea {
@@ -115,12 +116,23 @@ html, body {
   background: rgba(255,255,255,0.6);
   resize: none;
   outline: none;
-  font-size: 14px;
   text-align: center;
   line-height: 1.4;
   box-sizing: border-box;
   padding: 6px;
   cursor: text;
+}
+
+.card.text-small textarea {
+  font-size: 12px;
+}
+
+.card.text-medium textarea {
+  font-size: 16px;
+}
+
+.card.text-large textarea {
+  font-size: 20px;
 }
 
 .card.shape-circle,

@@ -16,21 +16,22 @@
     <span>Canvas Memo</span>
   </nav>
 
-  <div id="main-content">
-    <div id="sidebar">
-      <h3>ツール</h3>
-      <div class="tool-section">
-        <h4>カード追加</h4>
-        <button class="shape-btn" data-shape="rounded-rect">角丸四角</button>
-        <button class="shape-btn" data-shape="rect">長方形</button>
-        <button class="shape-btn" data-shape="circle">丸</button>
-        <button class="shape-btn" data-shape="ellipse">楕円</button>
-      </div>
+  <div id="toolbar">
+    <div class="toolbar-section">
+      <span class="toolbar-label">ツール</span>
+      <button class="shape-btn" data-shape="circle">○</button>
+      <button class="shape-btn" data-shape="rect">□</button>
+      <button class="shape-btn" data-shape="rounded-rect">▢</button>
+      <button class="shape-btn" data-shape="ellipse">楕円</button>
+      <span class="toolbar-divider">|</span>
+      <button class="size-btn active" data-size="large">大</button>
+      <button class="size-btn" data-size="medium">中</button>
+      <button class="size-btn" data-size="small">小</button>
     </div>
+  </div>
 
-    <div id="canvas-container">
-      <div id="canvas"></div>
-    </div>
+  <div id="canvas-container">
+    <div id="canvas"></div>
   </div>
 
   <script src="script.js"></script>
