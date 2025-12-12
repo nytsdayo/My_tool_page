@@ -5,14 +5,14 @@ document.addEventListener('DOMContentLoaded', () => {
   modeCards.forEach(card => {
     card.addEventListener('click', (e) => {
       // リンク(<a>)をクリックした場合は、デフォルト動作に任せる
-      if (e.target.tagName === 'A') {
+      if (e.target.matches('a')) {
         return;
       }
       
       // カード内のリンクを取得して遷移
       const link = card.querySelector('a');
       if (link) {
-        location.href = link.href;
+        window.location.href = link.href;
       }
     });
   });
