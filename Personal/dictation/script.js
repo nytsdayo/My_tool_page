@@ -77,11 +77,11 @@ function updatePreview(text) {
 }
 
 function highlightByCharIndex(charIndex) {
-    if (!wordMap.length) {
+    const lastWord = wordMap[wordMap.length - 1];
+    if (!lastWord) {
         console.debug('No words available to highlight.');
         return;
     }
-    const lastWord = wordMap[wordMap.length - 1];
     if (charIndex < 0 || charIndex >= lastWord.end) {
         console.debug('Boundary event charIndex is out of range:', charIndex);
         return;
