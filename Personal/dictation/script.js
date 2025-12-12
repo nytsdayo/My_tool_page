@@ -19,6 +19,7 @@ let voices = [];
 let utterance = null;
 let wordMap = [];
 let activeIndex = -1;
+let previewTimer = null;
 
 function updateSliderLabels() {
     rateValue.textContent = `${Number(rateRange.value).toFixed(1)}x`;
@@ -77,7 +78,8 @@ function updatePreview(text) {
 
 function highlightByCharIndex(charIndex) {
     if (!wordMap.length) return;
-    if (charIndex < 0 || charIndex >= wordMap[wordMap.length - 1].end) {
+    const lastWord = wordMap[wordMap.length - 1];
+    if (charIndex < 0 || charIndex >= lastWord.end) {
         console.debug('境界イベントの charIndex が範囲外です:', charIndex);
         return;
     }
@@ -215,6 +217,8 @@ function speak() {
         setUIState('idle');
         const reason = event?.error || '不明なエラー';
         setStatus(`読み上げ中にエラーが発生しました: ${reason}`);
+        resetHighlight();
+        utterance = null;
     };
 
     utterance.onboundary = (event) => {
@@ -258,7 +262,13 @@ function init() {
     stopButton.addEventListener('click', cancelSpeech);
 
     textInput.addEventListener('input', () => {
-        updatePreview(textInput.value);
+        if (previewTimer) {
+            clearTimeout(previewTimer);
+        }
+        previewTimer = setTimeout(() => {
+            updatePreview(textInput.value);
+        }, 120);
+
         if (synth.speaking || synth.paused) {
             cancelSpeech();
         }
