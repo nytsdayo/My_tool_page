@@ -5,111 +5,7 @@
   <meta charset="UTF-8" />
   <title>Canvas Memo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    html, body {
-      margin: 0;
-      height: 100%;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f9fafb;
-      display: flex;
-      flex-direction: column;
-    }
-    .breadcrumb {
-      background: #ffffff;
-      padding: 12px 20px;
-      border-bottom: 1px solid #e5e7eb;
-      font-size: 14px;
-      color: #6b7280;
-    }
-    .breadcrumb a {
-      color: #3b82f6;
-      text-decoration: none;
-    }
-    .breadcrumb a:hover {
-      text-decoration: underline;
-    }
-    .container {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 40px;
-      padding: 40px;
-    }
-    .mode-card {
-      background: white;
-      border: 2px solid #e5e7eb;
-      border-radius: 12px;
-      padding: 40px;
-      width: 300px;
-      text-align: center;
-      transition: all 0.3s;
-      cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    .mode-card:hover {
-      border-color: #3b82f6;
-      box-shadow: 0 4px 16px rgba(59,130,246,0.2);
-      transform: translateY(-4px);
-    }
-    .mode-card h2 {
-      margin: 0 0 16px 0;
-      color: #111827;
-      font-size: 24px;
-    }
-    .mode-card p {
-      margin: 0 0 24px 0;
-      color: #6b7280;
-      font-size: 14px;
-      line-height: 1.6;
-    }
-    .mode-card a {
-      display: inline-block;
-      padding: 10px 24px;
-      background: #3b82f6;
-      color: white;
-      text-decoration: none;
-      border-radius: 6px;
-      font-weight: 500;
-      transition: background 0.2s;
-    }
-    .mode-card a:hover {
-      background: #2563eb;
-    }
-    .icon {
-      font-size: 48px;
-      margin-bottom: 16px;
-    }
-    
-    /* レスポンシブ対応 */
-    @media (max-width: 768px) {
-      .container {
-        flex-direction: column;
-        gap: 20px;
-        padding: 20px;
-      }
-      
-      .mode-card {
-        width: 100%;
-        max-width: 400px;
-        padding: 30px;
-      }
-    }
-    
-    @media (max-width: 480px) {
-      .mode-card {
-        padding: 20px;
-      }
-      
-      .mode-card h2 {
-        font-size: 20px;
-      }
-      
-      .icon {
-        font-size: 36px;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="index.css" />
 </head>
 <body>
   <nav class="breadcrumb">
@@ -121,14 +17,14 @@
   </nav>
 
   <div class="container">
-    <div class="mode-card" onclick="location.href='plain-mode.html'">
+    <div class="mode-card">
       <div class="icon">📝</div>
       <h2>白紙モード</h2>
       <p>図形やフリーハンドで自由に描画できます。メモやアイデアのスケッチに最適です。</p>
       <a href="plain-mode.html">開く</a>
     </div>
 
-    <div class="mode-card" onclick="location.href='lined-mode.html'">
+    <div class="mode-card">
       <div class="icon">📄</div>
       <h2>罫線モード</h2>
       <p>罫線入りのノート形式で文字を入力できます。議事録や文章作成に最適です。</p>
@@ -136,5 +32,6 @@
     </div>
   </div>
 
+  <script src="index.js"></script>
 </body>
 </html>
