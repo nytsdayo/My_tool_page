@@ -9,6 +9,8 @@ const state = {
   currentTextSize: "large",
   selectedCard: null,
   drawingFreehand: false,
+  freehandPressTimer: null,
+  freehandLongPressThreshold: 300,
   currentPath: [],
   canvasData: {
     cards: [],
@@ -32,10 +34,14 @@ function addCard(shape = "rounded-rect") {
     h = 120;
   }
 
+  if (shape === "arrow") {
+    w = 200;
+    h = 60;
+  }
+
   if (shape === "freehand") {
-    state.drawingFreehand = true;
-    state.currentPath = [];
-    canvas.style.cursor = "crosshair";
+    // フリーハンドモードはボタンを押下し続けている状態で有効化
+    // 何もしない（長押しで有効化される）
     return;
   }
 
@@ -161,8 +167,37 @@ function updateTextSizeButtons() {
 document.querySelectorAll('.shape-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const shape = btn.dataset.shape;
-    addCard(shape);
+    if (shape !== 'freehand') {
+      addCard(shape);
+    }
   });
+  
+  // フリーハンドボタンのみ長押しで有効化
+  if (btn.dataset.shape === 'freehand') {
+    btn.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      state.freehandPressTimer = setTimeout(() => {
+        state.drawingFreehand = true;
+        state.currentPath = [];
+        canvas.style.cursor = "crosshair";
+        btn.classList.add('active');
+      }, state.freehandLongPressThreshold);
+    });
+    
+    btn.addEventListener('mouseup', () => {
+      if (state.freehandPressTimer) {
+        clearTimeout(state.freehandPressTimer);
+        state.freehandPressTimer = null;
+      }
+    });
+    
+    btn.addEventListener('mouseleave', () => {
+      if (state.freehandPressTimer) {
+        clearTimeout(state.freehandPressTimer);
+        state.freehandPressTimer = null;
+      }
+    });
+  }
 });
 
 document.querySelectorAll('.size-btn').forEach(btn => {
@@ -295,6 +330,8 @@ window.addEventListener("mouseup", () => {
     state.currentPath = [];
     state.drawingFreehand = false;
     canvas.style.cursor = "default";
+    // フリーハンドボタンのアクティブクラスを削除
+    document.querySelector('.shape-btn[data-shape="freehand"]')?.classList.remove('active');
     render();
   }
   
