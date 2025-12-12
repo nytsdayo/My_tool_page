@@ -52,6 +52,7 @@ h1 {
 
 .badge {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    /* Fallback to ensure sufficient contrast if gradients are unavailable */
     background-color: #6b5fd1;
     color: #fff;
     padding: 6px 12px;

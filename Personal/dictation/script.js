@@ -12,6 +12,8 @@ const pitchRange = document.getElementById('pitchRange');
 const rateValue = document.getElementById('rateValue');
 const pitchValue = document.getElementById('pitchValue');
 
+const PREVIEW_DEBOUNCE_MS = 120;
+
 const supportsSpeech = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
 const synth = supportsSpeech ? window.speechSynthesis : null;
 
@@ -225,7 +227,7 @@ function speak() {
     };
 
     utterance.onboundary = (event) => {
-        // In Chromium-based browsers (Chrome/Edge), onboundary name can be undefined while charIndex is provided for word boundaries, so prefer charIndex.
+        // Chromium browsers may not set event.name for word boundaries, but provide charIndex. Handle both cases.
         if (event.name === 'word' || event.name === undefined) {
             handleBoundary(event);
         }
@@ -270,7 +272,7 @@ function init() {
         }
         previewTimer = setTimeout(() => {
             updatePreview(textInput.value);
-        }, 120);
+        }, PREVIEW_DEBOUNCE_MS);
 
         if (synth.speaking || synth.paused) {
             cancelSpeech();
