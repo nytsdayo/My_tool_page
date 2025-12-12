@@ -1,5 +1,35 @@
 const canvas = document.getElementById("canvas");
 
+// タッチイベントとマウスイベントを統一的に扱うヘルパー関数
+function getEventCoordinates(e) {
+  if (e.touches && e.touches.length > 0) {
+    return { clientX: e.touches[0].clientX, clientY: e.touches[0].clientY };
+  }
+  return { clientX: e.clientX, clientY: e.clientY };
+}
+
+function addUnifiedEventListener(element, eventType, handler) {
+  if (eventType === 'pointerdown') {
+    element.addEventListener('mousedown', handler);
+    element.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      handler(e);
+    });
+  } else if (eventType === 'pointermove') {
+    element.addEventListener('mousemove', handler);
+    element.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      handler(e);
+    });
+  } else if (eventType === 'pointerup') {
+    element.addEventListener('mouseup', handler);
+    element.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      handler(e);
+    });
+  }
+}
+
 const state = {
   draggingCard: null,
   dragOffset: { x: 0, y: 0 },
@@ -103,12 +133,14 @@ function render() {
     corners.forEach(corner => {
       const handle = document.createElement("div");
       handle.className = `resize-handle resize-${corner}`;
-      handle.addEventListener("mousedown", e => {
+      
+      const resizeHandler = (e) => {
+        const coords = getEventCoordinates(e);
         state.resizingCard = card;
         state.resizeCorner = corner;
         state.resizeStart = {
-          x: e.clientX,
-          y: e.clientY,
+          x: coords.clientX,
+          y: coords.clientY,
           w: card.w,
           h: card.h,
           cardX: card.x,
@@ -116,31 +148,38 @@ function render() {
         };
         e.stopPropagation();
         e.preventDefault();
-      });
+      };
+      
+      addUnifiedEventListener(handle, 'pointerdown', resizeHandler);
       el.appendChild(handle);
     });
 
-    el.addEventListener("mousedown", e => {
+    const dragHandler = (e) => {
       if (e.target === ta || e.target.classList.contains('resize-handle')) {
         return;
       }
       
+      const coords = getEventCoordinates(e);
       state.selectedCard = card;
       updateTextSizeButtons();
       
       state.draggingCard = card;
       state.dragOffset = {
-        x: e.clientX - card.x,
-        y: e.clientY - card.y
+        x: coords.clientX - card.x,
+        y: coords.clientY - card.y
       };
       e.stopPropagation();
-    });
+    };
+    
+    addUnifiedEventListener(el, 'pointerdown', dragHandler);
 
-    ta.addEventListener("mousedown", e => {
+    const textareaClickHandler = (e) => {
       state.selectedCard = card;
       updateTextSizeButtons();
       render();
-    });
+    };
+    
+    addUnifiedEventListener(ta, 'pointerdown', textareaClickHandler);
 
     el.appendChild(ta);
     canvas.appendChild(el);
@@ -188,11 +227,13 @@ document.getElementById('clear-btn').addEventListener('click', () => {
   }
 });
 
-window.addEventListener("mousemove", e => {
+const moveHandler = (e) => {
+  const coords = getEventCoordinates(e);
+  
   if (state.drawingFreehand) {
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const x = coords.clientX - rect.left;
+    const y = coords.clientY - rect.top;
     state.currentPath.push({ x, y });
     
     // 一時パスのみを更新（render()は呼ばない）
@@ -230,8 +271,8 @@ window.addEventListener("mousemove", e => {
   }
 
   if (state.resizingCard) {
-    const dx = e.clientX - state.resizeStart.x;
-    const dy = e.clientY - state.resizeStart.y;
+    const dx = coords.clientX - state.resizeStart.x;
+    const dy = coords.clientY - state.resizeStart.y;
     
     const minSize = getMinSize(state.resizingCard.textSize);
     
@@ -262,31 +303,36 @@ window.addEventListener("mousemove", e => {
   }
   
   if (state.draggingCard) {
-    state.draggingCard.x = e.clientX - state.dragOffset.x;
-    state.draggingCard.y = e.clientY - state.dragOffset.y;
+    state.draggingCard.x = coords.clientX - state.dragOffset.x;
+    state.draggingCard.y = coords.clientY - state.dragOffset.y;
     render();
     return;
   }
-});
+};
 
-canvas.addEventListener("click", e => {
+addUnifiedEventListener(window, 'pointermove', moveHandler);
+
+const canvasDownHandler = (e) => {
+  // フリーハンドモードの場合、描画開始
+  if (state.drawingFreehand) {
+    const coords = getEventCoordinates(e);
+    const rect = canvas.getBoundingClientRect();
+    const x = coords.clientX - rect.left;
+    const y = coords.clientY - rect.top;
+    state.currentPath = [{ x, y }];
+  }
+  
+  // canvasの背景をクリックした場合、選択解除
   if (e.target === canvas) {
     state.selectedCard = null;
     updateTextSizeButtons();
     render();
   }
-});
+};
 
-canvas.addEventListener("mousedown", e => {
-  if (state.drawingFreehand) {
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    state.currentPath = [{ x, y }];
-  }
-});
+addUnifiedEventListener(canvas, 'pointerdown', canvasDownHandler);
 
-window.addEventListener("mouseup", () => {
+const upHandler = () => {
   if (state.drawingFreehand && state.currentPath.length > 1) {
     state.canvasData.freehandPaths.push({
       id: state.canvasData.nextPathId++,
@@ -300,6 +346,8 @@ window.addEventListener("mouseup", () => {
   
   state.draggingCard = null;
   state.resizingCard = null;
-});
+};
+
+addUnifiedEventListener(window, 'pointerup', upHandler);
 
 render();
