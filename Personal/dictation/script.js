@@ -210,6 +210,7 @@ function speak() {
     };
 
     utterance.onboundary = (event) => {
+        // 一部ブラウザでは name が undefined のままでも charIndex が渡されるため、その場合も処理する
         if (event.name === 'word' || event.name === undefined) {
             handleBoundary(event);
         }
@@ -257,15 +258,17 @@ function init() {
 
     rateRange.addEventListener('input', () => {
         updateSliderLabels();
-        if (utterance) {
-            utterance.rate = Number(rateRange.value);
+        if (synth.speaking || synth.paused) {
+            cancelSpeech();
+            setStatus('速度を変更しました。もう一度「再生」を押してください。');
         }
     });
 
     pitchRange.addEventListener('input', () => {
         updateSliderLabels();
-        if (utterance) {
-            utterance.pitch = Number(pitchRange.value);
+        if (synth.speaking || synth.paused) {
+            cancelSpeech();
+            setStatus('ピッチを変更しました。もう一度「再生」を押してください。');
         }
     });
 }
