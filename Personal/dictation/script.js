@@ -77,10 +77,13 @@ function updatePreview(text) {
 }
 
 function highlightByCharIndex(charIndex) {
-    if (!wordMap.length) return;
+    if (!wordMap.length) {
+        console.debug('No words available to highlight.');
+        return;
+    }
     const lastWord = wordMap[wordMap.length - 1];
     if (charIndex < 0 || charIndex >= lastWord.end) {
-        console.debug('境界イベントの charIndex が範囲外です:', charIndex);
+        console.debug('Boundary event charIndex is out of range:', charIndex);
         return;
     }
 
@@ -161,8 +164,8 @@ function cancelSpeech() {
 }
 
 function handleBoundary(event) {
-    if (!Number.isInteger(event.charIndex) || event.charIndex < 0) {
-        console.debug('charIndex が数値ではありません:', event);
+    if (typeof event.charIndex !== 'number' || Number.isNaN(event.charIndex) || event.charIndex < 0) {
+        console.debug('charIndex is not a valid number:', event);
         return;
     }
     highlightByCharIndex(event.charIndex);
@@ -222,7 +225,7 @@ function speak() {
     };
 
     utterance.onboundary = (event) => {
-        // Chromium系（Chrome/Edge）では onboundary の name が undefined でも charIndex が単語境界で渡されるケースがあるため、charIndex を優先して処理する
+        // In Chromium-based browsers (Chrome/Edge), onboundary name can be undefined while charIndex is provided for word boundaries, so prefer charIndex.
         if (event.name === 'word' || event.name === undefined) {
             handleBoundary(event);
         }
