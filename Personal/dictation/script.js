@@ -77,6 +77,10 @@ function updatePreview(text) {
 
 function highlightByCharIndex(charIndex) {
     if (!wordMap.length) return;
+    if (charIndex < 0 || charIndex > wordMap[wordMap.length - 1].end) {
+        console.debug('境界イベントの charIndex が範囲外です:', charIndex);
+        return;
+    }
 
     const targetIndex = wordMap.findIndex(
         (word) => charIndex >= word.start && charIndex < word.end
@@ -155,7 +159,10 @@ function cancelSpeech() {
 }
 
 function handleBoundary(event) {
-    if (typeof event.charIndex !== 'number') return;
+    if (typeof event.charIndex !== 'number') {
+        console.debug('charIndex が数値ではありません:', event);
+        return;
+    }
     highlightByCharIndex(event.charIndex);
 }
 
@@ -211,8 +218,8 @@ function speak() {
     };
 
     utterance.onboundary = (event) => {
-        // 一部ブラウザでは name が undefined のままでも charIndex が渡されるため、その場合も処理する
-        if ((event.name === 'word' || event.name === undefined) && typeof event.charIndex === 'number') {
+        // Chromium系ブラウザでは name が undefined のままでも charIndex が渡されることがあるため、この条件で判定する
+        if (event.name === 'word' || event.name === undefined) {
             handleBoundary(event);
         }
     };
