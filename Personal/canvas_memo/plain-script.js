@@ -10,7 +10,7 @@ const state = {
   selectedCard: null,
   drawingFreehand: false,
   currentPath: [],
-  tree: {
+  canvasData: {
     cards: [],
     freehandPaths: [],
     nextId: 1,
@@ -19,7 +19,7 @@ const state = {
 };
 
 function addCard(shape = "rounded-rect") {
-  const data = state.tree;
+  const data = state.canvasData;
   const id = data.nextId++;
 
   let x = 100 + Math.random() * 400;
@@ -55,13 +55,13 @@ function getMinSize(textSize) {
 function render() {
   canvas.innerHTML = "";
 
-  if (state.tree.freehandPaths.length > 0) {
+  if (state.canvasData.freehandPaths.length > 0) {
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.classList.add("freehand-svg");
     svg.setAttribute("width", "794");
     svg.setAttribute("height", "1123");
     
-    state.tree.freehandPaths.forEach(pathData => {
+    state.canvasData.freehandPaths.forEach(pathData => {
       if (pathData.points.length > 1) {
         const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
         let d = `M ${pathData.points[0].x} ${pathData.points[0].y}`;
@@ -81,7 +81,7 @@ function render() {
     canvas.appendChild(svg);
   }
 
-  state.tree.cards.forEach(card => {
+  state.canvasData.cards.forEach(card => {
     const el = document.createElement("div");
     el.className = `card shape-${card.shape} text-${card.textSize}`;
     if (state.selectedCard === card) {
@@ -181,8 +181,8 @@ document.querySelectorAll('.size-btn').forEach(btn => {
 
 document.getElementById('clear-btn').addEventListener('click', () => {
   if (confirm('すべての内容を削除してよろしいですか？')) {
-    state.tree.cards = [];
-    state.tree.freehandPaths = [];
+    state.canvasData.cards = [];
+    state.canvasData.freehandPaths = [];
     state.selectedCard = null;
     render();
   }
@@ -276,8 +276,8 @@ canvas.addEventListener("mousedown", e => {
 
 window.addEventListener("mouseup", () => {
   if (state.drawingFreehand && state.currentPath.length > 1) {
-    state.tree.freehandPaths.push({
-      id: state.tree.nextPathId++,
+    state.canvasData.freehandPaths.push({
+      id: state.canvasData.nextPathId++,
       points: [...state.currentPath]
     });
     state.currentPath = [];
