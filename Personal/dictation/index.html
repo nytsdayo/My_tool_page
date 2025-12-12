@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ディクテーションツール - テキスト読み上げ</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-gradient"></div>
+    <div class="container">
+        <header>
+            <div class="title-row">
+                <h1>📖 ディクテーションツール</h1>
+                <span class="badge">TTS</span>
+            </div>
+            <p class="lead">
+                ブラウザの音声合成を使ってテキストを読み上げ、進行中の単語をハイライト表示します。
+            </p>
+        </header>
+
+        <section class="notice" id="unsupportedNotice" hidden>
+            <strong>お使いのブラウザは音声合成に対応していません。</strong><br>
+            Chrome、Edge、Safariなどの対応ブラウザでお試しください。
+        </section>
+
+        <section class="panel">
+            <div class="field-group">
+                <label for="voiceSelect">声の種類</label>
+                <select id="voiceSelect">
+                    <option value="">ブラウザのデフォルト</option>
+                </select>
+            </div>
+            <div class="slider-row">
+                <div class="field-group">
+                    <label for="rateRange">読み上げ速度 <span id="rateValue">1.0x</span></label>
+                    <input type="range" id="rateRange" min="0.7" max="1.4" step="0.1" value="1">
+                </div>
+                <div class="field-group">
+                    <label for="pitchRange">ピッチ <span id="pitchValue">1.0</span></label>
+                    <input type="range" id="pitchRange" min="0.7" max="1.3" step="0.1" value="1">
+                </div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="field-group">
+                <label for="textInput">読み上げるテキスト</label>
+                <textarea id="textInput" rows="6" placeholder="ここに読み上げたい文章を入力してください"></textarea>
+            </div>
+
+            <div class="button-row">
+                <button class="btn primary" id="playButton">▶︎ 再生</button>
+                <button class="btn" id="pauseButton" disabled>⏸ 一時停止</button>
+                <button class="btn" id="resumeButton" disabled>▶︎ 再開</button>
+                <button class="btn secondary" id="stopButton" disabled>⏹ 停止</button>
+            </div>
+
+            <p class="status" id="status">テキストを入力して「再生」を押してください。</p>
+        </section>
+
+        <section class="panel preview-panel" aria-live="polite" aria-label="読み上げプレビュー">
+            <div class="preview-header">
+                <h2>読み上げプレビュー</h2>
+                <span class="hint">再生中の単語がハイライトされます</span>
+            </div>
+            <div class="preview" id="preview">
+                <p class="placeholder">入力されたテキストがここに表示され、読み上げ中の単語がハイライトされます。</p>
+            </div>
+        </section>
+
+        <nav class="nav-links">
+            <a href="../index.html">← Personal Toolsへ</a>
+            <a href="../../index.html">🏠 トップページへ</a>
+        </nav>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
