@@ -261,3 +261,40 @@ button:hover {
   pointer-events: none;
   z-index: 5;
 }
+
+/* レスポンシブ対応 */
+@media (max-width: 834px) {
+  #canvas-container {
+    padding: 20px 10px;
+  }
+  
+  #canvas {
+    transform: scale(calc((100vw - 40px) / 794));
+    transform-origin: top center;
+  }
+}
+
+@media (max-width: 640px) {
+  #toolbar {
+    padding: 8px 10px;
+  }
+  
+  .toolbar-section {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  
+  .shape-btn,
+  .size-btn,
+  .mode-link,
+  .action-btn {
+    padding: 4px 12px;
+    font-size: 12px;
+    min-width: 40px;
+  }
+  
+  .toolbar-label {
+    font-size: 12px;
+    margin-right: 4px;
+  }
+}

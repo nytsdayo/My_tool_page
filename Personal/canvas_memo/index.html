@@ -80,6 +80,35 @@
       font-size: 48px;
       margin-bottom: 16px;
     }
+    
+    /* レスポンシブ対応 */
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+        gap: 20px;
+        padding: 20px;
+      }
+      
+      .mode-card {
+        width: 100%;
+        max-width: 400px;
+        padding: 30px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .mode-card {
+        padding: 20px;
+      }
+      
+      .mode-card h2 {
+        font-size: 20px;
+      }
+      
+      .icon {
+        font-size: 36px;
+      }
+    }
   </style>
 </head>
 <body>
