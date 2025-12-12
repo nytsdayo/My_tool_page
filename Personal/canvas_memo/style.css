@@ -1,0 +1,291 @@
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #f9fafb;
+}
+
+.breadcrumb {
+  background: #ffffff;
+  padding: 12px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.breadcrumb a {
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+#toolbar {
+  background: #ffffff;
+  padding: 12px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.toolbar-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.toolbar-label {
+  font-weight: 600;
+  font-size: 14px;
+  margin-right: 8px;
+  color: #111827;
+}
+
+.toolbar-divider {
+  color: #d1d5db;
+  margin: 0 4px;
+}
+
+.shape-btn,
+.size-btn {
+  padding: 6px 16px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+  min-width: 50px;
+}
+
+.shape-btn:hover,
+.size-btn:hover {
+  background: #f3f4f6;
+  border-color: #3b82f6;
+}
+
+.size-btn.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.layout-btn,
+.action-btn {
+  padding: 6px 16px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+  min-width: 50px;
+}
+
+.layout-btn:hover,
+.action-btn:hover {
+  background: #f3f4f6;
+  border-color: #3b82f6;
+}
+
+.layout-btn.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.action-btn {
+  background: #ef4444;
+  color: white;
+  border-color: #ef4444;
+}
+
+.action-btn:hover {
+  background: #dc2626;
+  border-color: #dc2626;
+}
+
+#canvas-container {
+  flex: 1;
+  overflow: auto;
+  background: #e5e7eb;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 20px;
+  height: calc(100vh - 45px - 60px);
+}
+
+#canvas {
+  position: relative;
+  width: 794px;
+  height: 1123px;
+  background: white;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  cursor: default;
+}
+
+#canvas.lined {
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 31px,
+    #e5e7eb 31px,
+    #e5e7eb 32px
+  );
+  background-size: 100% 32px;
+}
+
+#canvas-textarea {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: transparent;
+  resize: none;
+  outline: none;
+  font-size: 16px;
+  line-height: 32px;
+  padding: 8px 16px;
+  font-family: inherit;
+  z-index: 0;
+}
+
+.card {
+  position: absolute;
+  border: 3px solid #3b82f6;
+  border-radius: 14px;
+  background: #dbeafe;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  box-sizing: border-box;
+  cursor: move;
+  padding: 8px;
+  transition: box-shadow 0.2s;
+  z-index: 10;
+}
+
+.card.selected {
+  box-shadow: 0 0 0 3px #fbbf24, 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.card textarea {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: rgba(255,255,255,0.6);
+  resize: none;
+  outline: none;
+  text-align: center;
+  line-height: 1.4;
+  box-sizing: border-box;
+  padding: 6px;
+  cursor: text;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card.text-small textarea {
+  font-size: 12px;
+}
+
+.card.text-medium textarea {
+  font-size: 16px;
+}
+
+.card.text-large textarea {
+  font-size: 20px;
+}
+
+.card.shape-circle,
+.card.shape-ellipse {
+  border-radius: 50%;
+}
+
+.card.shape-rounded-rect {
+  border-radius: 14px;
+}
+
+.card.shape-rect {
+  border-radius: 0;
+}
+
+.card.shape-circle textarea,
+.card.shape-ellipse textarea {
+  border-radius: 50%;
+}
+
+.card.shape-rounded-rect textarea {
+  border-radius: 10px;
+}
+
+.card.shape-rect textarea {
+  border-radius: 0;
+}
+
+button {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: none;
+  background: #e5e7eb;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #d1d5db;
+}
+
+.resize-handle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: #3b82f6;
+  border: 2px solid white;
+  border-radius: 50%;
+  z-index: 10;
+}
+
+.resize-top-left {
+  top: -6px;
+  left: -6px;
+  cursor: nwse-resize;
+}
+
+.resize-top-right {
+  top: -6px;
+  right: -6px;
+  cursor: nesw-resize;
+}
+
+.resize-bottom-left {
+  bottom: -6px;
+  left: -6px;
+  cursor: nesw-resize;
+}
+
+.resize-bottom-right {
+  bottom: -6px;
+  right: -6px;
+  cursor: nwse-resize;
+}
+
+.freehand-path {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.freehand-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+}
