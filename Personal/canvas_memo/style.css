@@ -6,27 +6,95 @@ html, body {
   background: #f9fafb;
 }
 
-#toolbar {
-  position: fixed;
-  top: 8px;
-  left: 8px;
-  z-index: 10;
+.breadcrumb {
   background: #ffffff;
-  padding: 8px;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  padding: 12px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.breadcrumb a {
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+#main-content {
   display: flex;
-  gap: 6px;
+  height: calc(100% - 45px);
+}
+
+#sidebar {
+  width: 200px;
+  background: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  padding: 16px;
+  overflow-y: auto;
+  box-shadow: 2px 0 4px rgba(0,0,0,0.05);
+}
+
+#sidebar h3 {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  color: #111827;
+}
+
+#sidebar h4 {
+  margin: 12px 0 8px 0;
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.tool-section {
+  margin-bottom: 16px;
+}
+
+.shape-btn {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  cursor: pointer;
+  font-size: 14px;
+  text-align: left;
+  transition: all 0.2s;
+}
+
+.shape-btn:hover {
+  background: #f3f4f6;
+  border-color: #3b82f6;
+}
+
+.shape-btn:active {
+  background: #e5e7eb;
+}
+
+#canvas-container {
+  flex: 1;
+  overflow: auto;
+  background: #e5e7eb;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 20px;
 }
 
 #canvas {
   position: relative;
-  width: 100vw;
-  height: 100vh;
-  cursor: grab;
-}
-#canvas:active {
-  cursor: grabbing;
+  width: 794px;
+  height: 1123px;
+  background: white;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  cursor: default;
 }
 
 .card {
@@ -36,6 +104,8 @@ html, body {
   background: #dbeafe;
   box-shadow: 0 4px 8px rgba(0,0,0,0.15);
   box-sizing: border-box;
+  cursor: move;
+  padding: 8px;
 }
 
 .card textarea {
@@ -48,9 +118,35 @@ html, body {
   font-size: 14px;
   text-align: center;
   line-height: 1.4;
-  border-radius: 10px;
   box-sizing: border-box;
   padding: 6px;
+  cursor: text;
+}
+
+.card.shape-circle,
+.card.shape-ellipse {
+  border-radius: 50%;
+}
+
+.card.shape-rounded-rect {
+  border-radius: 14px;
+}
+
+.card.shape-rect {
+  border-radius: 0;
+}
+
+.card.shape-circle textarea,
+.card.shape-ellipse textarea {
+  border-radius: 50%;
+}
+
+.card.shape-rounded-rect textarea {
+  border-radius: 10px;
+}
+
+.card.shape-rect textarea {
+  border-radius: 0;
 }
 
 button {
@@ -63,4 +159,38 @@ button {
 
 button:hover {
   background: #d1d5db;
+}
+
+.resize-handle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: #3b82f6;
+  border: 2px solid white;
+  border-radius: 50%;
+  z-index: 10;
+}
+
+.resize-top-left {
+  top: -6px;
+  left: -6px;
+  cursor: nwse-resize;
+}
+
+.resize-top-right {
+  top: -6px;
+  right: -6px;
+  cursor: nesw-resize;
+}
+
+.resize-bottom-left {
+  bottom: -6px;
+  left: -6px;
+  cursor: nesw-resize;
+}
+
+.resize-bottom-right {
+  bottom: -6px;
+  right: -6px;
+  cursor: nwse-resize;
 }
