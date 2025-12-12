@@ -80,12 +80,11 @@ function updatePreview(text) {
 
 function highlightByCharIndex(charIndex) {
     const lastWord = wordMap[wordMap.length - 1];
-    if (!lastWord) {
-        console.debug('No words available to highlight.');
-        return;
-    }
-    if (charIndex < 0 || charIndex >= lastWord.end) {
-        console.debug('Boundary event charIndex is out of range:', charIndex);
+    if (!lastWord || charIndex < 0 || charIndex >= lastWord.end) {
+        console.debug(
+            lastWord ? 'Boundary event charIndex is out of range:' : 'No words available to highlight.',
+            charIndex
+        );
         return;
     }
 
@@ -228,7 +227,7 @@ function speak() {
 
     utterance.onboundary = (event) => {
         // Chromium browsers may not set event.name for word boundaries, but provide charIndex. Handle both cases.
-        if (event.name === 'word' || event.name === undefined) {
+        if (event.name === 'word' || !event.name) {
             handleBoundary(event);
         }
     };
