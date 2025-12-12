@@ -1,5 +1,28 @@
 /* 罫線モード固有のスタイル */
 
+/* ツールボタン */
+.tool-btn {
+  padding: 6px 16px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+  min-width: 50px;
+}
+
+.tool-btn:hover {
+  background: #f3f4f6;
+  border-color: #3b82f6;
+}
+
+.tool-btn.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
 /* 罫線付きキャンバス */
 #canvas {
   background-image: repeating-linear-gradient(
@@ -29,4 +52,35 @@
   font-family: inherit;
   z-index: 0;
   box-sizing: border-box;
+}
+
+/* デコレーション要素 */
+.decoration {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.decoration.highlighter {
+  background: rgba(255, 255, 0, 0.3);
+  height: 32px;
+}
+
+.decoration.box {
+  border: 2px solid #3b82f6;
+  background: transparent;
+}
+
+.decoration.underline {
+  border-bottom: 3px solid #3b82f6;
+  height: 0;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 640px) {
+  .tool-btn {
+    padding: 4px 12px;
+    font-size: 12px;
+    min-width: 40px;
+  }
 }
