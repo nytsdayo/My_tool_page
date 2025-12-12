@@ -1,104 +1,7 @@
-html, body {
-  margin: 0;
-  height: 100%;
-  overflow: hidden;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: #f9fafb;
-}
+/* 罫線モード固有のスタイル */
 
-.breadcrumb {
-  background: #ffffff;
-  padding: 12px 20px;
-  border-bottom: 1px solid #e5e7eb;
-  font-size: 14px;
-  color: #6b7280;
-}
-
-.breadcrumb a {
-  color: #3b82f6;
-  text-decoration: none;
-}
-
-.breadcrumb a:hover {
-  text-decoration: underline;
-}
-
-#toolbar {
-  background: #ffffff;
-  padding: 12px 20px;
-  border-bottom: 1px solid #e5e7eb;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-
-.toolbar-section {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.toolbar-label {
-  font-weight: 600;
-  font-size: 14px;
-  margin-right: 8px;
-  color: #111827;
-}
-
-.toolbar-divider {
-  color: #d1d5db;
-  margin: 0 4px;
-}
-
-.mode-link {
-  padding: 6px 16px;
-  border-radius: 6px;
-  border: 1px solid #3b82f6;
-  background: #ffffff;
-  color: #3b82f6;
-  text-decoration: none;
-  font-size: 14px;
-  transition: all 0.2s;
-  min-width: 50px;
-  text-align: center;
-}
-
-.mode-link:hover {
-  background: #eff6ff;
-}
-
-.action-btn {
-  padding: 6px 16px;
-  border-radius: 6px;
-  border: 1px solid #ef4444;
-  background: #ef4444;
-  color: white;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.2s;
-  min-width: 50px;
-}
-
-.action-btn:hover {
-  background: #dc2626;
-  border-color: #dc2626;
-}
-
-#canvas-container {
-  flex: 1;
-  overflow: auto;
-  background: #e5e7eb;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 40px 20px;
-  height: calc(100vh - 45px - 60px);
-}
-
+/* 罫線付きキャンバス */
 #canvas {
-  position: relative;
-  width: 794px;
-  height: 1123px;
-  background: white;
   background-image: repeating-linear-gradient(
     transparent,
     transparent 31px,
@@ -106,11 +9,10 @@ html, body {
     #e5e7eb 32px
   );
   background-size: 100% 32px;
-  border: 1px solid #d1d5db;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   cursor: text;
 }
 
+/* テキストエリア */
 #canvas-textarea {
   position: absolute;
   top: 0;
@@ -127,38 +29,4 @@ html, body {
   font-family: inherit;
   z-index: 0;
   box-sizing: border-box;
-}
-/* レスポンシブ対応 */
-@media (max-width: 834px) {
-  #canvas-container {
-    padding: 20px 10px;
-  }
-  
-  #canvas {
-    transform: scale(calc((100vw - 40px) / 794));
-    transform-origin: top center;
-  }
-}
-
-@media (max-width: 640px) {
-  #toolbar {
-    padding: 8px 10px;
-  }
-  
-  .toolbar-section {
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-  
-  .mode-link,
-  .action-btn {
-    padding: 4px 12px;
-    font-size: 12px;
-    min-width: 40px;
-  }
-  
-  .toolbar-label {
-    font-size: 12px;
-    margin-right: 4px;
-  }
 }
