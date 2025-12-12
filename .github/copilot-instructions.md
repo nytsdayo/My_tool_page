@@ -23,10 +23,13 @@ This is a simple voice input web page that uses the Web Speech API for speech-to
 - `styles.css` - Main page styles
 - `voice-input/index.html` - Voice input page HTML
 - `voice-input/style.css` - Voice input page styles
+- `voice-input/script.js` - Voice input page JavaScript
 - `voice-input/text-cleaner.html` - Text cleaner page HTML
 - `voice-input/text-cleaner.css` - Text cleaner page styles
-- `42/ft_review_templete/index.html` - 42 review template tool
-- `42/minilibX_Japanese_Manual/index.html` - MinilibX Japanese manual
+- `voice-input/text-cleaner.js` - Text cleaner page JavaScript
+- `42/ft_review_templete/index.html` - 42 review template HTML
+- `42/ft_review_templete/style.css` - 42 review template styles
+- `42/ft_review_templete/script.js` - 42 review template JavaScript
 - `.github/workflows/deploy.yml` - GitHub Actions workflow for deploying to GitHub Pages
 - `.github/workflows/update-readme.yml` - GitHub Actions workflow for auto-updating README.md
 - `.github/scripts/generate-readme.js` - Script to generate README.md from HTML files
@@ -36,7 +39,10 @@ This is a simple voice input web page that uses the Web Speech API for speech-to
 
 When making changes to this project:
 
-1. **Separated structure**: HTML and CSS are now separated into different files. Keep this separation when making changes.
+1. **Separated structure**: HTML, CSS, and JavaScript are now separated into different files. Keep this separation when making changes.
+   - HTML files contain only structure and content
+   - CSS files contain all styling
+   - JavaScript files contain all functionality and logic
 
 2. **Browser compatibility**: Ensure changes work in Chrome, Edge, and Safari. The Web Speech API has varying support across browsers.
 
@@ -58,7 +64,7 @@ Since this is a static HTML page:
 ### Adding new features
 1. Add HTML elements in the appropriate HTML file
 2. Add CSS styles in the corresponding CSS file
-3. Add JavaScript in the `<script>` section of the HTML file
+3. Add JavaScript in the corresponding JavaScript file (not in the HTML file)
 
 ### Styling changes
 - Modify the appropriate CSS file (styles.css, style.css, or text-cleaner.css)
