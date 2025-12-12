@@ -35,7 +35,7 @@ function addCard(shape = "rounded-rect") {
   let w = 180;
   let h = 100;
 
-  // 丸の場合は正方形に
+  // 円形の場合は幅と高さを同じにして正円を描画する
   if (shape === "circle") {
     w = 120;
     h = 120;
