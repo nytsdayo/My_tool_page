@@ -155,8 +155,8 @@ function cancelSpeech() {
 }
 
 function handleBoundary(event) {
-    const index = typeof event.charIndex === 'number' ? event.charIndex : 0;
-    highlightByCharIndex(index);
+    if (typeof event.charIndex !== 'number') return;
+    highlightByCharIndex(event.charIndex);
 }
 
 function speak() {
@@ -204,14 +204,15 @@ function speak() {
         setStatus('読み上げを再開しました。');
     };
 
-    utterance.onerror = () => {
+    utterance.onerror = (event) => {
         setUIState('idle');
-        setStatus('読み上げ中にエラーが発生しました。');
+        const reason = event?.error || '不明なエラー';
+        setStatus(`読み上げ中にエラーが発生しました: ${reason}`);
     };
 
     utterance.onboundary = (event) => {
         // 一部ブラウザでは name が undefined のままでも charIndex が渡されるため、その場合も処理する
-        if (event.name === 'word' || event.name === undefined) {
+        if ((event.name === 'word' || event.name === undefined) && typeof event.charIndex === 'number') {
             handleBoundary(event);
         }
     };
