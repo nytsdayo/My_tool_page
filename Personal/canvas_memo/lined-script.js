@@ -1,7 +1,12 @@
 const canvas = document.getElementById("canvas");
 
-const LINE_HEIGHT = 32; // 行の高さ（CSSのline-heightと一致）
-const MIN_DRAW_SIZE = 10; // 最小描画サイズ（誤クリック防止）
+// タッチイベントとマウスイベントを統一的に扱うヘルパー関数
+function getEventCoordinates(e) {
+  if (e.touches && e.touches.length > 0) {
+    return { clientX: e.touches[0].clientX, clientY: e.touches[0].clientY };
+  }
+  return { clientX: e.clientX, clientY: e.clientY };
+}
 
 const state = {
   canvasText: "",
@@ -69,11 +74,13 @@ function render() {
     }
   });
   
-  // クリック位置に応じてカーソルを移動
-  textarea.addEventListener("click", e => {
+  // クリック/タッチ位置に応じてカーソルを移動
+  const clickHandler = (e) => {
+    const coords = getEventCoordinates(e);
     const rect = textarea.getBoundingClientRect();
-    const y = e.clientY - rect.top;
-    const clickedLine = Math.floor(y / LINE_HEIGHT);
+    const y = coords.clientY - rect.top;
+    const lineHeight = 32; // CSSのline-heightと一致
+    const clickedLine = Math.floor(y / lineHeight);
     
     // 現在の行数
     const currentLines = textarea.value.split('\n').length;
@@ -98,6 +105,12 @@ function render() {
     
     textarea.setSelectionRange(position, position);
     textarea.focus();
+  };
+  
+  textarea.addEventListener("click", clickHandler);
+  textarea.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    clickHandler(e);
   });
   
   canvas.appendChild(textarea);
