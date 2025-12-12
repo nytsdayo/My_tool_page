@@ -33,7 +33,7 @@ export function addCard(state, shape = "rounded-rect") {
     state.drawingFreehand = true;
     state.currentPath = [];
     document.getElementById("canvas").style.cursor = "crosshair";
-    return;
+    return false; // フリーハンドモードに入るだけで、再描画は不要
   }
 
   data.cards.push({ id, x, y, w, h, text: "", shape, textSize: state.currentTextSize });
