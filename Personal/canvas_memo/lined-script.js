@@ -69,10 +69,13 @@ function render() {
     
     // カーソル位置を計算
     const lines = textarea.value.split('\n');
+    // clickedLineが行数を超えないようにクリップ
+    const safeLine = Math.min(clickedLine, lines.length - 1);
     let position = 0;
-    for (let i = 0; i < Math.min(clickedLine, lines.length); i++) {
+    for (let i = 0; i < safeLine; i++) {
       position += lines[i].length + 1; // +1 for newline
     }
+    // safeLine行目の先頭にカーソルを置く
     
     textarea.setSelectionRange(position, position);
     textarea.focus();

@@ -1,18 +1,16 @@
-// モードカードのクリックイベントを設定
+// index.html用のJavaScript - モードカードのナビゲーション処理
+
 document.addEventListener('DOMContentLoaded', () => {
   const modeCards = document.querySelectorAll('.mode-card');
   
   modeCards.forEach(card => {
     card.addEventListener('click', (e) => {
-      // リンク(<a>)をクリックした場合は、デフォルト動作に任せる
-      if (e.target.matches('a')) {
-        return;
-      }
-      
-      // カード内のリンクを取得して遷移
-      const link = card.querySelector('a');
-      if (link) {
-        window.location.href = link.href;
+      // aタグのクリックは既に処理されるため、divクリック時のみ処理
+      if (e.target.tagName !== 'A') {
+        const link = card.querySelector('a');
+        if (link) {
+          window.location.href = link.href;
+        }
       }
     });
   });
