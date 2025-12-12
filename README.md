@@ -7,8 +7,11 @@
 ### 🎤 音声入力ページ
 音声入力ができるシンプルなWebページです。
 
-### 🧹 テキストクリーナー
-音声認識結果からカタカナのルビ、区切り文字、タイムスタンプを除去するツールです。
+### 📝 42レビュー用テンプレート
+42のプロジェクトレビュー用テンプレートを提供するツール。
+
+### 📚 minilibX日本語マニュアル
+minilibXの日本語マニュアルとサンプルコード集。
 
 ## GitHub Pages
 
@@ -44,9 +47,24 @@
 
 ```
 /
-├── index.html              # トップページ（ツールボックス）
-├── voice-input/
-│   ├── index.html          # 音声入力ページ
-│   └── text-cleaner.html   # テキストクリーナー
+├── index.html              # トップページ（42とPersonalへのアクセス）
+├── styles.css              # 共通スタイル
+├── 42/
+│   ├── index.html          # 42関連ツールの一覧
+│   ├── ft_review_templete/
+│   │   └── index.html      # 42レビュー用テンプレート
+│   └── minilibX_Japanese_Manual/
+│       └── index.html      # minilibX日本語マニュアル
+├── Personal/
+│   ├── index.html          # 個人用ツールの一覧
+│   └── voice-input/
+│       ├── index.html      # 音声入力ページ
+│       ├── style.css       # 音声入力ページのスタイル
+│       ├── text-cleaner.html  # テキストクリーナー
+│       └── text-cleaner.css   # テキストクリーナーのスタイル
 └── README.md
 ```
+
+---
+
+*このREADMEは、HTMLファイルの変更時に自動的に更新されます。*
