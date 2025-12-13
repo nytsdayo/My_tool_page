@@ -23,14 +23,26 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME)
       .then((cache) => {
         console.log('Opened cache');
-        // Cache available resources, but don't fail if some are missing
-        return Promise.allSettled(
-          urlsToCache.map(url => 
+        // Critical files that must be cached
+        const criticalFiles = ['./index.html', './style.css', './script.js', './manifest.json'];
+        // Optional files (icons)
+        const optionalFiles = urlsToCache.filter(url => !criticalFiles.includes(url));
+        
+        // Cache critical files - fail if any fail
+        const criticalPromise = Promise.all(
+          criticalFiles.map(url => cache.add(url))
+        );
+        
+        // Cache optional files - don't fail if some fail
+        const optionalPromise = Promise.allSettled(
+          optionalFiles.map(url => 
             cache.add(url).catch(err => {
-              console.log(`Failed to cache ${url}:`, err);
+              console.log(`Optional file failed to cache ${url}:`, err);
             })
           )
         );
+        
+        return Promise.all([criticalPromise, optionalPromise]);
       })
   );
   // Force the waiting service worker to become the active service worker

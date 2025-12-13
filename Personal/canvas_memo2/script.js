@@ -12,7 +12,6 @@ const state = {
   drawingStart: null,
   tempShape: null,
   drawingFreehand: false,
-  freehandPressTimer: null,
   currentPath: [],
   canvasData: {
     cards: [],
@@ -25,7 +24,6 @@ const state = {
 };
 
 // Constants
-const FREEHAND_LONG_PRESS_MS = 300;
 const STORAGE_KEY = 'canvas_memo2_data';
 
 // Elements
@@ -79,7 +77,8 @@ function createCard(x, y, text = '') {
   textarea.value = text;
   card.appendChild(textarea);
 
-  // Prevent text selection from starting drag
+  // Prevent text editing from triggering card drag
+  // stopPropagation ensures clicking in textarea doesn't start card drag
   textarea.addEventListener('mousedown', (e) => e.stopPropagation());
   textarea.addEventListener('touchstart', (e) => e.stopPropagation());
 
@@ -277,7 +276,7 @@ canvas.addEventListener('mousedown', (e) => {
   if (e.target === canvas) {
     if (state.drawingShape) {
       startShapeDrawing(e, state.drawingShape);
-    } else if (state.drawingFreehand && state.freehandPressTimer === null) {
+    } else if (state.drawingFreehand) {
       // Freehand drawing
       const coords = getEventCoordinates(e);
       const canvasRect = canvas.getBoundingClientRect();
@@ -294,7 +293,7 @@ canvas.addEventListener('touchstart', (e) => {
     e.preventDefault();
     if (state.drawingShape) {
       startShapeDrawing(e, state.drawingShape);
-    } else if (state.drawingFreehand && state.freehandPressTimer === null) {
+    } else if (state.drawingFreehand) {
       const coords = getEventCoordinates(e);
       const canvasRect = canvas.getBoundingClientRect();
       state.currentPath = [{
@@ -463,6 +462,7 @@ function renderCanvas() {
     textarea.value = cardData.text || '';
     card.appendChild(textarea);
 
+    // Prevent text editing from triggering card drag
     textarea.addEventListener('mousedown', (e) => e.stopPropagation());
     textarea.addEventListener('touchstart', (e) => e.stopPropagation());
 
@@ -486,9 +486,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// Prevent default touch behaviors
-document.body.addEventListener('touchmove', (e) => {
-  if (e.target === canvas || e.target.closest('.canvas')) {
-    e.preventDefault();
-  }
+// Prevent default touch behaviors only for canvas drawing
+canvas.addEventListener('touchmove', (e) => {
+  e.preventDefault();
 }, { passive: false });
