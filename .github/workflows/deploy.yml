@@ -61,6 +61,7 @@ jobs:
           name: github-pages
           path: deploy_temp/
           retention-days: 1
+          overwrite: true
 
   deploy:
     needs: build-flutter
