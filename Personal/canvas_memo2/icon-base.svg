@@ -1,0 +1,29 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" fill="#6200EE" rx="64"/>
+  
+  <!-- Memo Card -->
+  <rect x="80" y="100" width="280" height="200" fill="#FFFFFF" rx="8"/>
+  
+  <!-- Lines on card -->
+  <line x1="120" y1="150" x2="320" y2="150" stroke="#E0E0E0" stroke-width="4"/>
+  <line x1="120" y1="190" x2="320" y2="190" stroke="#E0E0E0" stroke-width="4"/>
+  <line x1="120" y1="230" x2="280" y2="230" stroke="#E0E0E0" stroke-width="4"/>
+  
+  <!-- Pencil -->
+  <g transform="translate(320, 280)">
+    <!-- Pencil body -->
+    <rect x="0" y="0" width="40" height="140" fill="#FFB300" rx="4"/>
+    <polygon points="0,140 20,180 40,140" fill="#F57C00"/>
+    <rect x="0" y="0" width="40" height="20" fill="#FDD835"/>
+    <!-- Pencil tip -->
+    <polygon points="10,180 20,200 30,180" fill="#424242"/>
+  </g>
+  
+  <!-- Drawing shapes -->
+  <circle cx="420" cy="150" r="35" fill="none" stroke="#03DAC6" stroke-width="6"/>
+  <rect x="150" y="340" width="70" height="70" fill="none" stroke="#03DAC6" stroke-width="6" rx="8"/>
+  
+  <!-- Freehand line -->
+  <path d="M 250 360 Q 280 340, 310 360 T 370 360" fill="none" stroke="#03DAC6" stroke-width="6" stroke-linecap="round"/>
+</svg>

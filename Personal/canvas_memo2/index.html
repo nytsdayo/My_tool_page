@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#6200EE" />
+  <meta name="description" content="Material Design UIを採用したPWA版Canvas Memo" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Canvas Memo 2 - PWA</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+</head>
+<body>
+  <!-- App Bar (Material Design) -->
+  <header class="app-bar elevation-4">
+    <button class="icon-button" id="menu-btn" aria-label="メニュー">
+      <svg width="24" height="24" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" />
+      </svg>
+    </button>
+    <h1 class="app-bar-title">Canvas Memo 2</h1>
+    <button class="icon-button" id="clear-btn" aria-label="クリア">
+      <svg width="24" height="24" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" />
+      </svg>
+    </button>
+    <button class="icon-button" id="save-btn" aria-label="保存">
+      <svg width="24" height="24" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M15,9H5V5H15M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3Z" />
+      </svg>
+    </button>
+  </header>
+
+  <!-- Navigation Drawer -->
+  <nav class="drawer" id="drawer">
+    <div class="drawer-header">
+      <h2>ツール</h2>
+      <button class="icon-button" id="close-drawer-btn" aria-label="閉じる">
+        <svg width="24" height="24" viewBox="0 0 24 24">
+          <path fill="currentColor" d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" />
+        </svg>
+      </button>
+    </div>
+    <div class="drawer-content">
+      <div class="drawer-section">
+        <div class="drawer-label">図形</div>
+        <button class="drawer-item shape-btn" data-shape="circle">
+          <span class="icon">○</span>
+          <span>円</span>
+        </button>
+        <button class="drawer-item shape-btn" data-shape="rect">
+          <span class="icon">□</span>
+          <span>四角形</span>
+        </button>
+        <button class="drawer-item shape-btn" data-shape="rounded-rect">
+          <span class="icon">▢</span>
+          <span>角丸四角形</span>
+        </button>
+        <button class="drawer-item shape-btn" data-shape="ellipse">
+          <span class="icon">⬭</span>
+          <span>楕円</span>
+        </button>
+        <button class="drawer-item shape-btn" data-shape="arrow">
+          <span class="icon">→</span>
+          <span>矢印</span>
+        </button>
+        <button class="drawer-item shape-btn" data-shape="freehand">
+          <span class="icon">✏️</span>
+          <span>フリーハンド</span>
+        </button>
+      </div>
+      <div class="drawer-divider"></div>
+      <div class="drawer-section">
+        <div class="drawer-label">サイズ</div>
+        <button class="drawer-item size-btn active" data-size="large">
+          <span class="icon">◯</span>
+          <span>大</span>
+        </button>
+        <button class="drawer-item size-btn" data-size="medium">
+          <span class="icon">○</span>
+          <span>中</span>
+        </button>
+        <button class="drawer-item size-btn" data-size="small">
+          <span class="icon">○</span>
+          <span>小</span>
+        </button>
+      </div>
+      <div class="drawer-divider"></div>
+      <div class="drawer-section">
+        <a href="../canvas_memo/index.html" class="drawer-item">
+          <span class="icon">📝</span>
+          <span>Canvas Memo (旧版)</span>
+        </a>
+        <a href="../index.html" class="drawer-item">
+          <span class="icon">🏠</span>
+          <span>Personal Toolsへ</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Drawer Overlay -->
+  <div class="drawer-overlay" id="drawer-overlay"></div>
+
+  <!-- Canvas Container -->
+  <main class="canvas-container">
+    <div id="canvas" class="canvas"></div>
+  </main>
+
+  <!-- Floating Action Button -->
+  <button class="fab elevation-6" id="add-card-btn" aria-label="カードを追加">
+    <svg width="24" height="24" viewBox="0 0 24 24">
+      <path fill="currentColor" d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+    </svg>
+  </button>
+
+  <!-- Snackbar for notifications -->
+  <div class="snackbar" id="snackbar">
+    <span id="snackbar-message"></span>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    // Register Service Worker for PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js')
+          .then(registration => console.log('ServiceWorker registered:', registration.scope))
+          .catch(error => console.log('ServiceWorker registration failed:', error));
+      });
+    }
+  </script>
+</body>
+</html>
