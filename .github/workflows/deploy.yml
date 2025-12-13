@@ -22,22 +22,65 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  build-flutter:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+
+      - name: Get Flutter dependencies
+        run: |
+          cd Personal/canvas_memo2
+          flutter pub get
+
+      - name: Build Flutter Web
+        run: |
+          cd Personal/canvas_memo2
+          flutter build web --release --base-href /My_tool_page/Personal/canvas_memo2/
+
+      - name: Copy Flutter build to deploy directory
+        run: |
+          # Create a temporary directory for deployment
+          mkdir -p deploy_temp
+          # Copy all files except canvas_memo2
+          rsync -av --exclude='Personal/canvas_memo2' --exclude='deploy_temp' --exclude='.git' . deploy_temp/
+          # Create canvas_memo2 directory in deploy
+          mkdir -p deploy_temp/Personal/canvas_memo2
+          # Copy Flutter build output
+          cp -r Personal/canvas_memo2/build/web/* deploy_temp/Personal/canvas_memo2/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: github-pages
+          path: deploy_temp/
+          retention-days: 1
+
+  deploy:
+    needs: build-flutter
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          path: .
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
-      - name: Upload artifact
+      - name: Upload to GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
           path: '.'
 
       - name: Deploy to GitHub Pages

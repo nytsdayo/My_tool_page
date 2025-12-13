@@ -12,11 +12,9 @@
   
   <!-- Pencil -->
   <g transform="translate(320, 280)">
-    <!-- Pencil body -->
     <rect x="0" y="0" width="40" height="140" fill="#FFB300" rx="4"/>
     <polygon points="0,140 20,180 40,140" fill="#F57C00"/>
     <rect x="0" y="0" width="40" height="20" fill="#FDD835"/>
-    <!-- Pencil tip -->
     <polygon points="10,180 20,200 30,180" fill="#424242"/>
   </g>
   
