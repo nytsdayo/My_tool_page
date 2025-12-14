@@ -42,7 +42,7 @@ jobs:
       - name: Build Flutter Web
         run: |
           cd Personal/canvas_memo2
-          flutter build web --release --base-href /My_tool_page/Personal/canvas_memo2/
+          flutter build web --release --base-href /My_tool_page/Personal/canvas_memo2/ --web-renderer html
 
       - name: Copy Flutter build to deploy directory
         run: |
