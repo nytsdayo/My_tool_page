@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'models/canvas_item.dart';
 import 'models/shape_type.dart';
 import 'widgets/canvas_painter.dart';
+import 'widgets/tool_menu.dart';
 
 class CanvasPage extends StatefulWidget {
   const CanvasPage({super.key});
@@ -84,7 +85,6 @@ class _CanvasPageState extends State<CanvasPage> {
     setState(() {
       _selectedShape = shape;
     });
-    Navigator.pop(context); // Close drawer
     if (shape != null) {
       _showSnackBar('${shape.displayName}描画モード有効');
     }
@@ -94,7 +94,6 @@ class _CanvasPageState extends State<CanvasPage> {
     setState(() {
       _strokeWidth = width;
     });
-    Navigator.pop(context); // Close drawer
     _showSnackBar('サイズ: $label');
   }
 
@@ -157,6 +156,73 @@ class _CanvasPageState extends State<CanvasPage> {
     }
   }
 
+  void _onTapUp(TapUpDetails details) {
+    // Only allow editing if no shape is selected for drawing
+    if (_selectedShape != null) return;
+
+    final RenderBox? renderBox =
+        _canvasKey.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox == null) return;
+
+    final localPosition = renderBox.globalToLocal(details.globalPosition);
+
+    // Iterate in reverse to find top-most item
+    for (int i = _items.length - 1; i >= 0; i--) {
+      final item = _items[i];
+      if (item.isTextCard) {
+        final rect = Rect.fromLTWH(
+          item.position.dx,
+          item.position.dy,
+          item.size.width,
+          item.size.height,
+        );
+
+        if (rect.contains(localPosition)) {
+          _editTextCard(item);
+          return;
+        }
+      }
+    }
+  }
+
+  void _editTextCard(CanvasItem item) {
+    final textController = TextEditingController(text: item.text);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('テキストを編集'),
+        content: TextField(
+          controller: textController,
+          autofocus: true,
+          maxLines: 5,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            hintText: 'テキストを入力してください',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('キャンセル'),
+          ),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                final index = _items.indexWhere((e) => e.id == item.id);
+                if (index != -1) {
+                  _items[index] = item.copyWith(text: textController.text);
+                }
+              });
+              Navigator.pop(context);
+            },
+            child: const Text('保存'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -177,124 +243,34 @@ class _CanvasPageState extends State<CanvasPage> {
           ),
         ],
       ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              child: const Text(
-                'ツール',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                ),
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text(
-                '図形',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey,
-                ),
-              ),
-            ),
-            ListTile(
-              leading: const Text('○', style: TextStyle(fontSize: 24)),
-              title: const Text('円'),
-              selected: _selectedShape == ShapeType.circle,
-              onTap: () => _selectShape(ShapeType.circle),
-            ),
-            ListTile(
-              leading: const Text('□', style: TextStyle(fontSize: 24)),
-              title: const Text('四角形'),
-              selected: _selectedShape == ShapeType.rectangle,
-              onTap: () => _selectShape(ShapeType.rectangle),
-            ),
-            ListTile(
-              leading: const Text('▢', style: TextStyle(fontSize: 24)),
-              title: const Text('角丸四角形'),
-              selected: _selectedShape == ShapeType.roundedRectangle,
-              onTap: () => _selectShape(ShapeType.roundedRectangle),
-            ),
-            ListTile(
-              leading: const Text('⬭', style: TextStyle(fontSize: 24)),
-              title: const Text('楕円'),
-              selected: _selectedShape == ShapeType.ellipse,
-              onTap: () => _selectShape(ShapeType.ellipse),
-            ),
-            ListTile(
-              leading: const Text('→', style: TextStyle(fontSize: 24)),
-              title: const Text('矢印'),
-              selected: _selectedShape == ShapeType.arrow,
-              onTap: () => _selectShape(ShapeType.arrow),
-            ),
-            ListTile(
-              leading: const Text('✏️', style: TextStyle(fontSize: 24)),
-              title: const Text('フリーハンド'),
-              selected: _selectedShape == ShapeType.freehand,
-              onTap: () => _selectShape(ShapeType.freehand),
-            ),
-            const Divider(),
-            const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text(
-                'サイズ',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey,
-                ),
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.circle, size: 32),
-              title: const Text('大'),
-              selected: _strokeWidth == 6.0,
-              onTap: () => _setStrokeWidth(6.0, '大'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.circle, size: 24),
-              title: const Text('中'),
-              selected: _strokeWidth == 4.0,
-              onTap: () => _setStrokeWidth(4.0, '中'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.circle, size: 16),
-              title: const Text('小'),
-              selected: _strokeWidth == 2.0,
-              onTap: () => _setStrokeWidth(2.0, '小'),
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.description),
-              title: const Text('Canvas Memo (旧版)'),
-              onTap: () {
-                // This would navigate in a real web app
-                _showSnackBar('ブラウザで別のページに移動してください');
-              },
-            ),
-          ],
-        ),
-      ),
-      body: GestureDetector(
-        key: _canvasKey,
-        onPanStart: _onPanStart,
-        onPanUpdate: _onPanUpdate,
-        onPanEnd: _onPanEnd,
-        child: Container(
-          color: Colors.grey[100],
-          child: CustomPaint(
-            painter: CanvasPainter(
-              items: _items,
-              tempItem: _tempItem,
-            ),
-            child: const SizedBox.expand(),
+      body: Row(
+        children: [
+          ToolMenu(
+            selectedShape: _selectedShape,
+            strokeWidth: _strokeWidth,
+            onShapeSelected: _selectShape,
+            onStrokeWidthChanged: _setStrokeWidth,
           ),
-        ),
+          Expanded(
+            child: GestureDetector(
+              key: _canvasKey,
+              onTapUp: _onTapUp,
+              onPanStart: _onPanStart,
+              onPanUpdate: _onPanUpdate,
+              onPanEnd: _onPanEnd,
+              child: Container(
+                color: Colors.grey[100],
+                child: CustomPaint(
+                  painter: CanvasPainter(
+                    items: _items,
+                    tempItem: _tempItem,
+                  ),
+                  child: const SizedBox.expand(),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addTextCard,
