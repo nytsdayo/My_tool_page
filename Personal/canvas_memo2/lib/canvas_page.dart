@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'models/canvas_item.dart';
 import 'models/shape_type.dart';
 import 'widgets/canvas_painter.dart';
-import 'dart:ui' as ui;
 
 class CanvasPage extends StatefulWidget {
   const CanvasPage({super.key});
