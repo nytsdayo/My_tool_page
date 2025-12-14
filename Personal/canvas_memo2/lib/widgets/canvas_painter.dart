@@ -1,7 +1,8 @@
+import 'dart:ui' as ui;
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../models/canvas_item.dart';
 import '../models/shape_type.dart';
-import 'dart:math' as math;
 
 class CanvasPainter extends CustomPainter {
   final List<CanvasItem> items;
@@ -40,7 +41,7 @@ class CanvasPainter extends CustomPainter {
     // Draw card shadow
     final shadowPaint = Paint()
       ..color = Colors.black.withOpacity(0.1)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
+      ..maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 4);
     canvas.drawRRect(
       RRect.fromRectAndRadius(
         rect.shift(const Offset(2, 2)),
