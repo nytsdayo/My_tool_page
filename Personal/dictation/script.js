@@ -11,6 +11,16 @@ const rateRange = document.getElementById('rateRange');
 const pitchRange = document.getElementById('pitchRange');
 const rateValue = document.getElementById('rateValue');
 const pitchValue = document.getElementById('pitchValue');
+const loopCheckbox = document.getElementById('loopCheckbox');
+const blindModeCheckbox = document.getElementById('blindModeCheckbox');
+
+// Recording Elements
+const recordButton = document.getElementById('recordButton');
+const stopRecordButton = document.getElementById('stopRecordButton');
+const recordingStatus = document.getElementById('recordingStatus');
+const audioPlayerContainer = document.getElementById('audioPlayerContainer');
+const audioPlayback = document.getElementById('audioPlayback');
+const downloadLink = document.getElementById('downloadLink');
 
 const PREVIEW_DEBOUNCE_MS = 120;
 
@@ -22,6 +32,11 @@ let utterance = null;
 let wordMap = [];
 let activeIndex = -1;
 let previewTimer = null;
+let isLooping = false;
+
+// Recorder variables
+let mediaRecorder = null;
+let audioChunks = [];
 
 function updateSliderLabels() {
     rateValue.textContent = `${Number(rateRange.value).toFixed(1)}x`;
@@ -81,10 +96,6 @@ function updatePreview(text) {
 function highlightByCharIndex(charIndex) {
     const lastWord = wordMap[wordMap.length - 1];
     if (!lastWord || charIndex < 0 || charIndex >= lastWord.end) {
-        console.debug(
-            lastWord ? 'Boundary event charIndex is out of range:' : 'No words available to highlight.',
-            charIndex
-        );
         return;
     }
 
@@ -118,6 +129,7 @@ function setUIState(state) {
         pauseButton.disabled = false;
         resumeButton.disabled = true;
         stopButton.disabled = false;
+        textInput.disabled = true;
     } else if (state === 'paused') {
         playButton.disabled = true;
         pauseButton.disabled = true;
@@ -128,6 +140,7 @@ function setUIState(state) {
         pauseButton.disabled = true;
         resumeButton.disabled = true;
         stopButton.disabled = true;
+        textInput.disabled = false;
     }
 }
 
@@ -166,7 +179,6 @@ function cancelSpeech() {
 
 function handleBoundary(event) {
     if (typeof event.charIndex !== 'number' || Number.isNaN(event.charIndex) || event.charIndex < 0) {
-        console.debug('charIndex is not a valid number:', event);
         return;
     }
     highlightByCharIndex(event.charIndex);
@@ -195,7 +207,7 @@ function speak() {
 
     utterance.onstart = () => {
         setUIState('playing');
-        setStatus('読み上げ中...');
+        setStatus(isLooping ? '読み上げ中 (ループ再生)' : '読み上げ中...');
         if (wordMap.length) {
             highlightByCharIndex(0);
         }
@@ -203,8 +215,15 @@ function speak() {
 
     utterance.onend = () => {
         resetHighlight();
-        setUIState('idle');
-        setStatus('読み上げが完了しました。');
+        if (isLooping && textInput.value.trim() !== '') {
+            // Loop functionality
+            setTimeout(() => {
+                if (isLooping) speak();
+            }, 500); // Short pause before looping
+        } else {
+            setUIState('idle');
+            setStatus('読み上げが完了しました。');
+        }
     };
 
     utterance.onpause = () => {
@@ -218,6 +237,9 @@ function speak() {
     };
 
     utterance.onerror = (event) => {
+        // Interrupted is common when cancelling
+        if (event.error === 'interrupted') return;
+
         setUIState('idle');
         const reason = event?.error || '不明なエラー';
         setStatus(`読み上げ中にエラーが発生しました: ${reason}`);
@@ -226,7 +248,6 @@ function speak() {
     };
 
     utterance.onboundary = (event) => {
-        // Chromium browsers may not set event.name for word boundaries, but provide charIndex. Handle both cases.
         if (event.name === 'word' || !event.name) {
             handleBoundary(event);
         }
@@ -235,10 +256,64 @@ function speak() {
     synth.speak(utterance);
 }
 
+// --- Recording Functions ---
+
+async function setupRecorder() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        recordingStatus.textContent = 'お使いのブラウザは録音に対応していません。';
+        recordButton.disabled = true;
+        return;
+    }
+
+    recordButton.addEventListener('click', startRecording);
+    stopRecordButton.addEventListener('click', stopRecording);
+}
+
+async function startRecording() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = (event) => {
+            audioChunks.push(event.data);
+        };
+
+        mediaRecorder.onstop = () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            const audioUrl = URL.createObjectURL(audioBlob);
+            audioPlayback.src = audioUrl;
+            audioPlayerContainer.hidden = false;
+            downloadLink.href = audioUrl;
+
+            // Clean up tracks to stop microphone usage icon
+            stream.getTracks().forEach(track => track.stop());
+        };
+
+        mediaRecorder.start();
+        recordingStatus.textContent = '録音中...';
+        recordButton.disabled = true;
+        stopRecordButton.disabled = false;
+    } catch (err) {
+        console.error('Error accessing microphone:', err);
+        recordingStatus.textContent = 'マイクへのアクセスが拒否されました。設定を確認してください。';
+    }
+}
+
+function stopRecording() {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+        recordingStatus.textContent = '録音が完了しました。下のプレイヤーで確認できます。';
+        recordButton.disabled = false;
+        stopRecordButton.disabled = true;
+    }
+}
+
 function init() {
     updateSliderLabels();
     updatePreview('');
     setUIState('idle');
+    setupRecorder();
 
     if (!supportsSpeech) {
         unsupportedNotice.hidden = false;
@@ -263,7 +338,11 @@ function init() {
             synth.resume();
         }
     });
-    stopButton.addEventListener('click', cancelSpeech);
+    stopButton.addEventListener('click', () => {
+        isLooping = false;
+        loopCheckbox.checked = false;
+        cancelSpeech();
+    });
 
     textInput.addEventListener('input', () => {
         if (previewTimer) {
@@ -291,6 +370,18 @@ function init() {
         if (synth.speaking || synth.paused) {
             cancelSpeech();
             setStatus('ピッチを変更しました。もう一度「再生」を押してください。');
+        }
+    });
+
+    loopCheckbox.addEventListener('change', (e) => {
+        isLooping = e.target.checked;
+    });
+
+    blindModeCheckbox.addEventListener('change', (e) => {
+        if (e.target.checked) {
+            preview.classList.add('blind');
+        } else {
+            preview.classList.remove('blind');
         }
     });
 }

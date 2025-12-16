@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ディクテーションツール - テキスト読み上げ</title>
+    <title>シャドーイングツール - テキスト読み上げ & 録音</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,11 +11,11 @@
     <div class="container">
         <header>
             <div class="title-row">
-                <h1>📖 ディクテーションツール</h1>
-                <span class="badge">TTS</span>
+                <h1>📖 シャドーイングツール</h1>
+                <span class="badge">Shadowing</span>
             </div>
             <p class="lead">
-                ブラウザの音声合成を使ってテキストを読み上げ、進行中の単語をハイライト表示します。
+                テキストを読み上げてシャドーイング練習をしましょう。音声を録音して確認することもできます。
             </p>
         </header>
 
@@ -34,19 +34,24 @@
             <div class="slider-row">
                 <div class="field-group">
                     <label for="rateRange">読み上げ速度 <span id="rateValue">1.0x</span></label>
-                    <input type="range" id="rateRange" min="0.7" max="1.4" step="0.1" value="1">
+                    <input type="range" id="rateRange" min="0.5" max="2.0" step="0.1" value="1">
                 </div>
                 <div class="field-group">
                     <label for="pitchRange">ピッチ <span id="pitchValue">1.0</span></label>
-                    <input type="range" id="pitchRange" min="0.7" max="1.3" step="0.1" value="1">
+                    <input type="range" id="pitchRange" min="0.5" max="2.0" step="0.1" value="1">
                 </div>
+            </div>
+            <div class="option-row">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="loopCheckbox"> ループ再生
+                </label>
             </div>
         </section>
 
         <section class="panel">
             <div class="field-group">
                 <label for="textInput">読み上げるテキスト</label>
-                <textarea id="textInput" rows="6" placeholder="ここに読み上げたい文章を入力してください"></textarea>
+                <textarea id="textInput" rows="6" placeholder="ここにシャドーイングしたい文章を入力してください"></textarea>
             </div>
 
             <div class="button-row">
@@ -62,11 +67,28 @@
         <section class="panel preview-panel" aria-live="polite" aria-label="読み上げプレビュー">
             <div class="preview-header">
                 <h2>読み上げプレビュー</h2>
-                <span class="hint">再生中の単語がハイライトされます</span>
+                <div class="preview-controls">
+                    <label class="checkbox-label-light">
+                        <input type="checkbox" id="blindModeCheckbox"> テキストを隠す (ブラインド)
+                    </label>
+                </div>
             </div>
             <div class="preview" id="preview">
                 <p class="placeholder">入力されたテキストがここに表示され、読み上げ中の単語がハイライトされます。</p>
             </div>
+        </section>
+
+        <section class="panel recording-panel">
+            <h2>🎙 録音機能</h2>
+            <div class="recording-controls">
+                <button class="btn record-btn" id="recordButton">● 録音開始</button>
+                <button class="btn stop-record-btn" id="stopRecordButton" disabled>⏹ 録音停止</button>
+            </div>
+            <div class="audio-player-container" id="audioPlayerContainer" hidden>
+                <audio id="audioPlayback" controls></audio>
+                <a id="downloadLink" class="download-link" download="recording.webm">録音をダウンロード</a>
+            </div>
+            <p class="status" id="recordingStatus">マイクの使用を許可してください。</p>
         </section>
 
         <nav class="nav-links">
