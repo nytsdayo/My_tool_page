@@ -37,6 +37,7 @@ let isLooping = false;
 // Recorder variables
 let mediaRecorder = null;
 let audioChunks = [];
+let currentStream = null;
 
 function updateSliderLabels() {
     rateValue.textContent = `${Number(rateRange.value).toFixed(1)}x`;
@@ -258,6 +259,13 @@ function speak() {
 
 // --- Recording Functions ---
 
+function cleanupStream() {
+    if (currentStream) {
+        currentStream.getTracks().forEach(track => track.stop());
+        currentStream = null;
+    }
+}
+
 async function setupRecorder() {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         recordingStatus.textContent = 'お使いのブラウザは録音に対応していません。';
@@ -271,8 +279,11 @@ async function setupRecorder() {
 
 async function startRecording() {
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        mediaRecorder = new MediaRecorder(stream);
+        // Clean up any existing stream first
+        cleanupStream();
+
+        currentStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(currentStream);
         audioChunks = [];
 
         mediaRecorder.ondataavailable = (event) => {
@@ -287,7 +298,7 @@ async function startRecording() {
             downloadLink.href = audioUrl;
 
             // Clean up tracks to stop microphone usage icon
-            stream.getTracks().forEach(track => track.stop());
+            cleanupStream();
         };
 
         mediaRecorder.start();
@@ -297,6 +308,8 @@ async function startRecording() {
     } catch (err) {
         console.error('Error accessing microphone:', err);
         recordingStatus.textContent = 'マイクへのアクセスが拒否されました。設定を確認してください。';
+        // Clean up stream if an error occurred after getting it
+        cleanupStream();
     }
 }
 
@@ -384,6 +397,10 @@ function init() {
             preview.classList.remove('blind');
         }
     });
+
+    // Clean up stream when page is being unloaded
+    window.addEventListener('beforeunload', cleanupStream);
+    window.addEventListener('pagehide', cleanupStream);
 }
 
 init();
