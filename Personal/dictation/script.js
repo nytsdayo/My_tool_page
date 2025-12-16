@@ -32,11 +32,14 @@ let utterance = null;
 let wordMap = [];
 let activeIndex = -1;
 let previewTimer = null;
+let loopTimer = null;
 let isLooping = false;
 
 // Recorder variables
 let mediaRecorder = null;
 let audioChunks = [];
+let currentStream = null;
+let currentAudioUrl = null;
 
 function updateSliderLabels() {
     rateValue.textContent = `${Number(rateRange.value).toFixed(1)}x`;
@@ -169,6 +172,11 @@ function populateVoices() {
 }
 
 function cancelSpeech() {
+    if (loopTimer) {
+        clearTimeout(loopTimer);
+        loopTimer = null;
+    }
+
     if (!supportsSpeech) return;
     synth.cancel();
     utterance = null;
@@ -217,8 +225,9 @@ function speak() {
         resetHighlight();
         if (isLooping && textInput.value.trim() !== '') {
             // Loop functionality
-            setTimeout(() => {
+            loopTimer = setTimeout(() => {
                 if (isLooping) speak();
+                loopTimer = null;
             }, 500); // Short pause before looping
         } else {
             setUIState('idle');
@@ -259,8 +268,9 @@ function speak() {
 // --- Recording Functions ---
 
 async function setupRecorder() {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        recordingStatus.textContent = 'お使いのブラウザは録音に対応していません。';
+    // Feature detection for MediaRecorder
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === 'undefined') {
+        recordingStatus.textContent = 'お使いのブラウザは録音に対応していません (MediaRecorder not supported)。';
         recordButton.disabled = true;
         return;
     }
@@ -269,9 +279,23 @@ async function setupRecorder() {
     stopRecordButton.addEventListener('click', stopRecording);
 }
 
+function cleanupRecordingStream() {
+    if (currentStream) {
+        currentStream.getTracks().forEach(track => track.stop());
+        currentStream = null;
+    }
+}
+
 async function startRecording() {
     try {
+        cleanupRecordingStream();
+        if (currentAudioUrl) {
+            URL.revokeObjectURL(currentAudioUrl);
+            currentAudioUrl = null;
+        }
+
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        currentStream = stream;
         mediaRecorder = new MediaRecorder(stream);
         audioChunks = [];
 
@@ -281,18 +305,15 @@ async function startRecording() {
 
         mediaRecorder.onstop = () => {
             const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-            // 既存のオブジェクトURLがあれば解放
-            if (currentAudioUrl) {
-                URL.revokeObjectURL(currentAudioUrl);
-            }
             const audioUrl = URL.createObjectURL(audioBlob);
             currentAudioUrl = audioUrl;
+
             audioPlayback.src = audioUrl;
             audioPlayerContainer.hidden = false;
             downloadLink.href = audioUrl;
 
-            // Clean up tracks to stop microphone usage icon
-            stream.getTracks().forEach(track => track.stop());
+            // Cleanup stream after recording stops
+            cleanupRecordingStream();
         };
 
         mediaRecorder.start();

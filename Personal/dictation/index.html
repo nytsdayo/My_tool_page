@@ -78,14 +78,14 @@
             </div>
         </section>
 
-        <section class="panel recording-panel">
+        <section class="panel recording-panel" aria-label="音声録音機能">
             <h2>🎙 録音機能</h2>
             <div class="recording-controls">
                 <button class="btn record-btn" id="recordButton">● 録音開始</button>
                 <button class="btn stop-record-btn" id="stopRecordButton" disabled>⏹ 録音停止</button>
             </div>
             <div class="audio-player-container" id="audioPlayerContainer" hidden>
-                <audio id="audioPlayback" controls aria-label="録音した音声の再生"></audio>
+                <audio id="audioPlayback" controls></audio>
                 <a id="downloadLink" class="download-link" download="recording.webm">録音をダウンロード</a>
             </div>
             <p class="status" id="recordingStatus">マイクの使用を許可してください。</p>

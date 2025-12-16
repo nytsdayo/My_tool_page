@@ -251,6 +251,7 @@ select:focus, textarea:focus, input[type="range"]:focus {
     word-break: break-word;
     border: 1px solid rgba(255, 255, 255, 0.08);
     transition: filter 0.3s ease;
+    will-change: filter;
 }
 
 /* Blind Mode */
