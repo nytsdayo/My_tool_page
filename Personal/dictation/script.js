@@ -281,7 +281,12 @@ async function startRecording() {
 
         mediaRecorder.onstop = () => {
             const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            // 既存のオブジェクトURLがあれば解放
+            if (currentAudioUrl) {
+                URL.revokeObjectURL(currentAudioUrl);
+            }
             const audioUrl = URL.createObjectURL(audioBlob);
+            currentAudioUrl = audioUrl;
             audioPlayback.src = audioUrl;
             audioPlayerContainer.hidden = false;
             downloadLink.href = audioUrl;
