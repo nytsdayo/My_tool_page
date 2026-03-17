@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ford-Johnson Merge Insertion Sort — Full Recursion Visualizer</title>
+<style>
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f5f0;
+    --bg-tertiary: #eeeee8;
+    --text-primary: #1a1a1a;
+    --text-secondary: #6b6b66;
+    --text-tertiary: #9c9c96;
+    --border-tertiary: rgba(0,0,0,0.12);
+    --border-secondary: rgba(0,0,0,0.25);
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-primary: #1a1a1a;
+      --bg-secondary: #2a2a28;
+      --bg-tertiary: #333330;
+      --text-primary: #e8e8e0;
+      --text-secondary: #a0a098;
+      --text-tertiary: #70706a;
+      --border-tertiary: rgba(255,255,255,0.12);
+      --border-secondary: rgba(255,255,255,0.25);
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); background: var(--bg-primary); color: var(--text-primary); padding: 2rem; max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 20px; font-weight: 500; margin-bottom: 0.25rem; }
+  .subtitle { font-size: 13px; color: var(--text-secondary); margin-bottom: 1.5rem; }
+  .controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .controls label { font-size: 13px; color: var(--text-secondary); }
+  input[type=number] {
+    width: 60px; height: 36px; border-radius: var(--radius-md); border: 0.5px solid var(--border-secondary);
+    background: var(--bg-primary); color: var(--text-primary); padding: 0 10px; font-size: 14px;
+    font-family: var(--font-sans);
+  }
+  input[type=number]:focus { outline: none; box-shadow: 0 0 0 2px rgba(100,100,255,0.3); }
+  button {
+    height: 36px; padding: 0 16px; border-radius: var(--radius-md); border: 0.5px solid var(--border-secondary);
+    background: transparent; color: var(--text-primary); font-size: 13px; font-family: var(--font-sans);
+    cursor: pointer; transition: background 0.15s, transform 0.1s;
+  }
+  button:hover { background: var(--bg-secondary); }
+  button:active { transform: scale(0.98); }
+  .step-nav { display: flex; gap: 8px; align-items: center; margin-bottom: 1rem; }
+  .step-nav button { min-width: 80px; }
+  .step-info { font-size: 14px; color: var(--text-secondary); margin-bottom: 0.75rem; min-height: 20px; }
+  .phase-label { font-size: 16px; font-weight: 500; color: var(--text-primary); margin-bottom: 0.5rem; }
+  .sub-phase { font-size: 13px; color: var(--text-tertiary); margin-bottom: 0.5rem; }
+  .arr-row { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 0.5rem; align-items: flex-end; }
+  .arr-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; margin-top: 8px; }
+  .cell {
+    min-width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;
+    border-radius: var(--radius-md); font-size: 13px; font-weight: 500; padding: 0 6px;
+    border: 0.5px solid var(--border-tertiary); background: var(--bg-secondary);
+    color: var(--text-primary); transition: all 0.3s ease; flex-shrink: 0;
+  }
+  .cell.winner { background: #E6F1FB; border-color: #85B7EB; color: #0C447C; }
+  .cell.loser { background: #FAEEDA; border-color: #FAC775; color: #633806; }
+  .cell.inserting { background: #EAF3DE; border-color: #97C459; color: #27500A; animation: pulse 0.5s ease; }
+  .cell.highlight { background: #EEEDFE; border-color: #AFA9EC; color: #3C3489; }
+  .cell.sorted { background: #E1F5EE; border-color: #5DCAA5; color: #085041; }
+  .cell.dimmed { opacity: 0.4; }
+  @media (prefers-color-scheme: dark) {
+    .cell.winner { background: #0C447C; border-color: #85B7EB; color: #B5D4F4; }
+    .cell.loser { background: #633806; border-color: #FAC775; color: #FAEEDA; }
+    .cell.inserting { background: #27500A; border-color: #97C459; color: #C0DD97; }
+    .cell.highlight { background: #3C3489; border-color: #AFA9EC; color: #CECBF6; }
+    .cell.sorted { background: #085041; border-color: #5DCAA5; color: #9FE1CB; }
+  }
+  .pair-group { display: inline-flex; gap: 2px; margin-right: 6px; padding: 4px; border-radius: 8px; background: var(--bg-tertiary); }
+  .pair-inner { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .pair-inner .tag { font-size: 10px; color: var(--text-tertiary); }
+  .depth-indent { margin-left: 0; padding-left: 12px; border-left: 2px solid var(--border-tertiary); margin-bottom: 8px; }
+  .depth-header { font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 6px; }
+  .section { margin-bottom: 12px; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 1.5rem; padding-top: 0.75rem; border-top: 0.5px solid var(--border-tertiary); }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }
+  .legend-swatch { width: 14px; height: 14px; border-radius: 4px; border: 0.5px solid; }
+  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.12)} }
+</style>
+</head>
+<body>
+<h1>Ford-Johnson (Merge Insertion Sort)</h1>
+<p class="subtitle">再帰過程を含む全ステップの可視化</p>
+
+<div class="controls">
+  <label>要素数 n =</label>
+  <input type="number" id="n-input" min="2" max="20" value="10">
+  <button onclick="generate()">生成</button>
+  <button onclick="randomize()">ランダム</button>
+</div>
+<div class="step-nav">
+  <button onclick="prevStep()">← 前</button>
+  <span id="step-counter" style="font-size:13px;color:var(--text-secondary);min-width:80px;text-align:center"></span>
+  <button onclick="nextStep()">次 →</button>
+  <button onclick="autoPlay()" id="auto-btn">自動再生</button>
+</div>
+<div class="phase-label" id="phase-label"></div>
+<div class="sub-phase" id="sub-phase"></div>
+<div class="step-info" id="step-info"></div>
+<div id="display"></div>
+<div class="legend">
+  <div class="legend-item"><div class="legend-swatch" style="background:#E6F1FB;border-color:#85B7EB"></div>勝者 (大)</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#FAEEDA;border-color:#FAC775"></div>敗者 (小)</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#EEEDFE;border-color:#AFA9EC"></div>探索中央</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#EAF3DE;border-color:#97C459"></div>挿入済</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#E1F5EE;border-color:#5DCAA5"></div>ソート完了</div>
+</div>
+
+<script>
+let steps=[], cur=0, autoI=null;
+
+function c(val, cls='') { return `<div class="cell ${cls}">${val}</div>`; }
+
+function generate() {
+  stopAuto();
+  const n = Math.max(2, Math.min(20, parseInt(document.getElementById('n-input').value)||10));
+  const arr=[], used=new Set();
+  while(arr.length<n){ const v=Math.floor(Math.random()*99)+1; if(!used.has(v)){used.add(v);arr.push(v);} }
+  buildSteps(arr);
+  cur=0; renderStep();
+}
+function randomize(){ document.getElementById('n-input').value=Math.floor(Math.random()*9)+4; generate(); }
+
+function buildSteps(origArr) {
+  steps = [];
+  steps.push({ phase:'① 初期配列', sub:'', info:`${origArr.length}個のランダムな数値`, render: ()=>{
+    return `<div class="arr-row">${origArr.map(v=>c(v)).join('')}</div>`;
+  }});
+
+  function fjSort(arr, depth) {
+    const hist = [];
+    const dLabel = depth > 0 ? `（再帰 深さ${depth}）` : '';
+
+    if (arr.length <= 1) return { sorted: [...arr], hist };
+
+    const pairs = [];
+    for (let i=0; i+1<arr.length; i+=2) pairs.push([arr[i], arr[i+1]]);
+    const unpaired = arr.length%2===1 ? arr[arr.length-1] : null;
+
+    hist.push({ phase:`② ペア作成${dLabel}`, sub:`深さ${depth}: ${arr.length}要素 → ${pairs.length}ペア${unpaired!==null?' + 余り1':''}`, info:`配列 [${arr.join(', ')}] の隣接要素をペアにする`, depth, type:'pairs', pairs:[...pairs.map(p=>[...p])], unpaired });
+
+    const winners=[], losers=[], compared=[];
+    for (const [a,b] of pairs) {
+      if (a>=b) { winners.push(a); losers.push(b); compared.push([a,b]); }
+      else { winners.push(b); losers.push(a); compared.push([b,a]); }
+    }
+
+    hist.push({ phase:`③ ペア内比較${dLabel}`, sub:`深さ${depth}: 各ペアの大小を判定`, info:`勝者=[${winners.join(', ')}]　敗者=[${losers.join(', ')}]${unpaired!==null?'　余り='+unpaired:''}`, depth, type:'compared', compared:[...compared.map(p=>[...p])], unpaired, winners:[...winners], losers:[...losers] });
+
+    let sortedWinners;
+    if (winners.length > 1) {
+      hist.push({ phase:`④ 勝者配列に再帰適用${dLabel}`, sub:`深さ${depth} → 深さ${depth+1}: 勝者 [${winners.join(', ')}] をさらにソート`, info:`勝者${winners.length}要素に対して再帰的にFord-Johnsonを適用`, depth, type:'recurse_start', winners:[...winners] });
+
+      const sub = fjSort(winners, depth+1);
+      sortedWinners = sub.sorted;
+      hist.push(...sub.hist);
+
+      hist.push({ phase:`④ 再帰完了${dLabel}`, sub:`深さ${depth+1}の再帰から復帰`, info:`勝者のソート結果: [${sortedWinners.join(', ')}]`, depth, type:'recurse_done', sortedWinners:[...sortedWinners], losers:[...losers], unpaired });
+    } else {
+      sortedWinners = [...winners];
+    }
+
+    let mainChain = [...sortedWinners];
+    const toInsert = [...losers];
+    if (unpaired !== null) toInsert.push(unpaired);
+
+    hist.push({ phase:`⑤ 二分探索で挿入開始${dLabel}`, sub:`深さ${depth}: メインチェーンに敗者を挿入`, info:`メインチェーン=[${mainChain.join(', ')}]　挿入対象=[${toInsert.join(', ')}]`, depth, type:'insert_start', mainChain:[...mainChain], toInsert:[...toInsert] });
+
+    const remaining = [...toInsert];
+    for (let ti=0; ti<toInsert.length; ti++) {
+      const val = toInsert[ti];
+      remaining.splice(remaining.indexOf(val), 1);
+
+      let lo=0, hi=mainChain.length;
+      const searchTrace = [];
+      while(lo<hi) {
+        const mid=Math.floor((lo+hi)/2);
+        searchTrace.push({lo,hi,mid,midVal:mainChain[mid]});
+        if(mainChain[mid]<val) lo=mid+1; else hi=mid;
+      }
+      const insertPos=lo;
+
+      for (const s of searchTrace) {
+        hist.push({ phase:`⑤ 二分探索${dLabel}`, sub:`深さ${depth}: ${val} の挿入位置を探索`, info:`範囲 [${s.lo}, ${s.hi})　中央 index=${s.mid} → 値${s.midVal} ${s.midVal<val?'< '+val+' → 右へ':'≥ '+val+' → 左へ'}`, depth, type:'bsearch', mainChain:[...mainChain], val, searchRange:{lo:s.lo,hi:s.hi,mid:s.mid}, remaining:[...remaining] });
+      }
+
+      mainChain.splice(insertPos, 0, val);
+      hist.push({ phase:`⑤ 挿入完了${dLabel}`, sub:`深さ${depth}: ${val} を位置${insertPos}に挿入`, info:`メインチェーン=[${mainChain.join(', ')}]`, depth, type:'inserted', mainChain:[...mainChain], val, insertPos, remaining:[...remaining] });
+    }
+
+    return { sorted: mainChain, hist };
+  }
+
+  const result = fjSort(origArr, 0);
+  for (const h of result.hist) {
+    steps.push({ phase:h.phase, sub:h.sub, info:h.info, render:()=>renderHist(h) });
+  }
+
+  steps.push({ phase:'ソート完了', sub:'', info:`${origArr.length}要素のソートが完了`, render:()=>{
+    return `<div class="arr-row">${result.sorted.map(v=>c(v,'sorted')).join('')}</div>`;
+  }});
+}
+
+function renderHist(h) {
+  const wrap = (depth, inner) => {
+    if (depth===0) return inner;
+    return `<div class="depth-indent"><div class="depth-header">再帰 深さ${depth}</div>${inner}</div>`;
+  };
+
+  if (h.type==='pairs') {
+    let html='<div class="arr-row">';
+    for(const[a,b] of h.pairs) html+=`<div class="pair-group"><div class="pair-inner"><div class="cell">${a}</div><div class="tag">L</div></div><div class="pair-inner"><div class="cell">${b}</div><div class="tag">R</div></div></div>`;
+    if(h.unpaired!==null) html+=c(h.unpaired);
+    html+='</div>';
+    return wrap(h.depth, html);
+  }
+  if (h.type==='compared') {
+    let html='<div class="section"><div class="arr-label">比較結果</div><div class="arr-row">';
+    for(const[w,l] of h.compared) html+=`<div class="pair-group"><div class="pair-inner"><div class="cell winner">${w}</div><div class="tag">大</div></div><div class="pair-inner"><div class="cell loser">${l}</div><div class="tag">小</div></div></div>`;
+    if(h.unpaired!==null) html+=c(h.unpaired);
+    html+='</div></div>';
+    html+='<div class="section"><div class="arr-label">勝者配列</div><div class="arr-row">'+h.winners.map(v=>c(v,'winner')).join('')+'</div></div>';
+    html+='<div class="section"><div class="arr-label">敗者配列</div><div class="arr-row">'+h.losers.map(v=>c(v,'loser')).join('')+'</div></div>';
+    return wrap(h.depth, html);
+  }
+  if (h.type==='recurse_start') {
+    let html=`<div class="section"><div class="arr-label">勝者配列を再帰ソートへ渡す</div><div class="arr-row">${h.winners.map(v=>c(v,'winner')).join('')}</div><div style="text-align:center;color:var(--text-tertiary);margin-top:8px">↓ 再帰呼び出し（深さ${h.depth+1}）</div></div>`;
+    return wrap(h.depth, html);
+  }
+  if (h.type==='recurse_done') {
+    let html=`<div class="section"><div class="arr-label">再帰から復帰 — ソート済み勝者</div><div class="arr-row">${h.sortedWinners.map(v=>c(v,'winner')).join('')}</div></div>`;
+    html+=`<div class="section"><div class="arr-label">敗者（これから挿入）</div><div class="arr-row">${h.losers.map(v=>c(v,'loser')).join('')}${h.unpaired!==null?c(h.unpaired,'loser'):''}</div></div>`;
+    return wrap(h.depth, html);
+  }
+  if (h.type==='insert_start') {
+    let html=`<div class="section"><div class="arr-label">メインチェーン</div><div class="arr-row">${h.mainChain.map(v=>c(v,'winner')).join('')}</div></div>`;
+    html+=`<div class="section"><div class="arr-label">挿入対象</div><div class="arr-row">${h.toInsert.map(v=>c(v,'loser')).join('')}</div></div>`;
+    return wrap(h.depth, html);
+  }
+  if (h.type==='bsearch') {
+    let html=`<div class="section"><div class="arr-label">メインチェーン（探索中: ${h.val}）</div><div class="arr-row">`;
+    for(let i=0;i<h.mainChain.length;i++){
+      let cls='';
+      if(i===h.searchRange.mid) cls='highlight';
+      else if(i>=h.searchRange.lo && i<h.searchRange.hi) cls='winner';
+      else cls='dimmed';
+      html+=c(h.mainChain[i], cls);
+    }
+    html+=`</div></div>`;
+    html+=`<div class="section"><div class="arr-label">挿入する値</div><div class="arr-row">${c(h.val,'inserting')}</div></div>`;
+    if(h.remaining.length>0) html+=`<div class="section"><div class="arr-label">未挿入</div><div class="arr-row">${h.remaining.map(v=>c(v,'loser')).join('')}</div></div>`;
+    return wrap(h.depth, html);
+  }
+  if (h.type==='inserted') {
+    let html=`<div class="section"><div class="arr-label">挿入後のメインチェーン</div><div class="arr-row">`;
+    for(let i=0;i<h.mainChain.length;i++){
+      html+=c(h.mainChain[i], h.mainChain[i]===h.val?'inserting':'');
+    }
+    html+=`</div></div>`;
+    if(h.remaining.length>0) html+=`<div class="section"><div class="arr-label">未挿入</div><div class="arr-row">${h.remaining.map(v=>c(v,'loser')).join('')}</div></div>`;
+    return wrap(h.depth, html);
+  }
+  return '';
+}
+
+function renderStep(){
+  if(!steps.length) return;
+  const s=steps[cur];
+  document.getElementById('phase-label').textContent=s.phase;
+  document.getElementById('sub-phase').textContent=s.sub||'';
+  document.getElementById('step-info').textContent=s.info;
+  document.getElementById('step-counter').textContent=`${cur+1} / ${steps.length}`;
+  document.getElementById('display').innerHTML=s.render();
+}
+
+function nextStep(){ if(cur<steps.length-1){cur++;renderStep();} }
+function prevStep(){ if(cur>0){cur--;renderStep();} }
+function stopAuto(){ if(autoI){clearInterval(autoI);autoI=null;document.getElementById('auto-btn').textContent='自動再生';} }
+function autoPlay(){
+  if(autoI){stopAuto();return;}
+  document.getElementById('auto-btn').textContent='停止';
+  autoI=setInterval(()=>{ if(cur>=steps.length-1){stopAuto();return;} nextStep(); },1200);
+}
+
+generate();
+</script>
+</body>
+</html>
