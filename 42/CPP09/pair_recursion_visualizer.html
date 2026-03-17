@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ford-Johnson Merge Insertion Sort — ペア活用・再帰展開ビジュアライザ</title>
+<link rel="stylesheet" href="pair_recursion_visualizer.css">
+</head>
+<body>
+<h1>Ford-Johnson (Merge Insertion Sort)</h1>
+<p class="subtitle">ペア対応による探索範囲制限・再帰過程の完全展開</p>
+
+<div class="tc">
+  <label>n =</label>
+  <input type="number" id="nIn" min="4" max="16" value="10">
+  <button onclick="gen()">生成</button>
+  <button onclick="rand()">ランダム</button>
+</div>
+<div class="nv">
+  <button onclick="pv()">← 前</button>
+  <span id="cnt" style="font-size:13px;color:var(--text-secondary);min-width:72px;text-align:center"></span>
+  <button onclick="nx()">次 →</button>
+  <button onclick="au()" id="ab">自動再生</button>
+</div>
+<div class="ph" id="ph"></div>
+<div class="sp" id="sp"></div>
+<div class="ds" id="ds"></div>
+<div id="out"></div>
+<div class="sr" id="st"></div>
+<div class="lg">
+  <div class="li"><div class="ls" style="background:#E6F1FB;border:.5px solid #85B7EB"></div>勝者</div>
+  <div class="li"><div class="ls" style="background:#FAEEDA;border:.5px solid #FAC775"></div>敗者</div>
+  <div class="li"><div class="ls" style="background:#EEEDFE;border:.5px solid #AFA9EC"></div>探索中央</div>
+  <div class="li"><div class="ls" style="background:#EAF3DE;border:.5px solid #97C459"></div>挿入済</div>
+  <div class="li"><div class="ls" style="border:2px dashed #D85A30;background:transparent"></div>ペア上限</div>
+</div>
+
+<script>
+let S=[],ci=0,ai=null;
+function c(v,cls=''){return `<div class="cl ${cls}">${v}</div>`}
+
+function gen(){
+  sa();
+  const n=Math.max(4,Math.min(16,parseInt(document.getElementById('nIn').value)||10));
+  const a=[],u=new Set();
+  while(a.length<n){const v=1+Math.floor(Math.random()*99);if(!u.has(v)){u.add(v);a.push(v);}}
+  build(a);ci=0;rn();
+}
+function rand(){document.getElementById('nIn').value=4+Math.floor(Math.random()*9);gen();}
+
+function build(orig){
+  S=[];
+  const counter={v:0};
+  function calcMaxDepth(len){if(len<=1)return 0;return 1+calcMaxDepth(Math.floor(len/2));}
+  const maxD=calcMaxDepth(orig.length);
+  function dl(depth){return `深さ${depth+1}/${maxD}`}
+
+  S.push({ph:'① 初期配列',sp:'',ds:`${orig.length}個の値: [${orig.join(', ')}]　再帰の最大深さ: ${maxD}`,
+    r:()=>`<div class="ch">${orig.map(v=>c(v)).join('')}</div>`,cmp:0});
+
+  function fj(arr,depth){
+    const steps=[];
+    if(arr.length<=1) return {sorted:[...arr],steps};
+    const pairs=[];
+    for(let i=0;i+1<arr.length;i+=2) pairs.push([arr[i],arr[i+1]]);
+    const unp=arr.length%2===1?arr[arr.length-1]:null;
+
+    steps.push({ph:`${dl(depth)} ② ペア作成`,sp:`${arr.length}要素 → ${pairs.length}ペア${unp!==null?' + 余り1':''}`,
+      ds:`配列 [${arr.join(', ')}] の隣接要素をペアにする`,depth,tp:'pairs',pairs:pairs.map(p=>[...p]),unp,cmp:counter.v});
+
+    const pm=[];
+    for(const[a,b] of pairs){counter.v++;if(a>=b)pm.push({w:a,l:b});else pm.push({w:b,l:a});}
+    const winners=pm.map(p=>p.w),losers=pm.map(p=>p.l);
+
+    steps.push({ph:`${dl(depth)} ③ ペア内比較`,sp:`${pairs.length}回比較`,
+      ds:`勝者=[${winners.join(', ')}]　敗者=[${losers.join(', ')}]${unp!==null?'　余り='+unp:''}\nペア対応を保持: 敗者 < 勝者 が保証される`,
+      depth,tp:'compared',pm:[...pm.map(p=>({...p}))],unp,winners:[...winners],losers:[...losers],cmp:counter.v});
+
+    let sortedW;
+    if(winners.length>1){
+      steps.push({ph:`${dl(depth)} ④ 勝者配列に再帰適用`,sp:`深さ${depth+1} → 深さ${depth+2}`,
+        ds:`勝者 [${winners.join(', ')}] に対して再帰的にFord-Johnsonを適用`,
+        depth,tp:'rec_start',winners:[...winners],cmp:counter.v});
+      const sub=fj(winners,depth+1);
+      sortedW=sub.sorted;
+      steps.push(...sub.steps);
+      steps.push({ph:`${dl(depth)} ④ 再帰完了`,sp:`深さ${depth+2}から復帰`,
+        ds:`勝者のソート結果: [${sortedW.join(', ')}]`,
+        depth,tp:'rec_done',sortedW:[...sortedW],losers:[...losers],pm:[...pm.map(p=>({...p}))],unp,cmp:counter.v});
+    } else {
+      sortedW=[...winners];
+    }
+
+    let mc=[...sortedW];
+    const toIns=pm.map(p=>({val:p.l,partner:p.w}));
+    if(unp!==null) toIns.push({val:unp,partner:null});
+
+    steps.push({ph:`${dl(depth)} ⑤ 挿入開始`,sp:`敗者を先頭から順に挿入`,
+      ds:`メインチェーン=[${mc.join(', ')}]\n挿入対象=[${toIns.map(t=>t.val).join(', ')}]`,
+      depth,tp:'ins_start',mc:[...mc],toIns:toIns.map(t=>({...t})),cmp:counter.v});
+
+    for(let step=0;step<toIns.length;step++){
+      const item=toIns[step];
+      const val=item.val,partner=item.partner;
+      const uIdx=partner!==null?mc.indexOf(partner):-1;
+      const hB=partner!==null&&uIdx>=0?uIdx:mc.length;
+      let tL=0,tH=hB;const trace=[];
+      while(tL<tH){const mid=Math.floor((tL+tH)/2);trace.push({lo:tL,hi:tH,mid,midVal:mc[mid]});if(mc[mid]<val)tL=mid+1;else tH=mid;}
+      const insPos=tL;
+
+      for(const t of trace){
+        counter.v++;
+        steps.push({ph:`${dl(depth)} ⑤ 挿入: ${val}`,sp:`二分探索`,
+          ds:`ペア相手: ${partner!==null?partner:'なし'} → 探索範囲 [0, ${hB}) の${hB}要素\n[${t.lo}, ${t.hi}) 中央=${t.midVal} ${t.midVal<val?'< '+val+' → 右半分へ':'≥ '+val+' → 左半分へ'}`,
+          depth,tp:'bsearch',mc:[...mc],val,partner,uIdx,hB,t:{...t},
+          remain:toIns.slice(step+1).map(x=>x.val),cmp:counter.v});
+      }
+      mc.splice(insPos,0,val);
+      steps.push({ph:`${dl(depth)} ⑤ ${val} 挿入完了`,sp:`位置${insPos}に挿入（比較${trace.length}回）`,
+        ds:`メインチェーン=[${mc.join(', ')}]`,depth,tp:'inserted',mc:[...mc],val,
+        remain:toIns.slice(step+1).map(x=>x.val),cmp:counter.v});
+    }
+    return {sorted:[...mc],steps};
+  }
+
+  const result=fj(orig,0);
+  for(const h of result.steps) S.push({ph:h.ph,sp:h.sp,ds:h.ds,r:()=>rh(h),cmp:h.cmp});
+  S.push({ph:'ソート完了',sp:'',ds:`全${orig.length}要素　比較回数: ${counter.v}`,
+    r:(()=>{const m=[...result.sorted];return()=>`<div class="ch">${m.map(v=>c(v,'dn')).join('')}</div>`})(),cmp:counter.v});
+}
+
+function wrap(d,inner){
+  if(d===0)return inner;
+  return `<div class="di"><div class="dh">再帰 深さ${d+1}</div>${inner}</div>`;
+}
+
+function rh(h){
+  const d=h.depth;
+  if(h.tp==='pairs'){
+    let html='<div class="ch">';
+    for(const[a,b] of h.pairs) html+=`<div style="display:inline-flex;gap:2px;margin-right:6px;padding:4px;border-radius:8px;background:var(--bg-tertiary,var(--color-background-tertiary,#eee))"><div style="display:flex;flex-direction:column;align-items:center;gap:2px">${c(a)}<span class="pa">L</span></div><div style="display:flex;flex-direction:column;align-items:center;gap:2px">${c(b)}<span class="pa">R</span></div></div>`;
+    if(h.unp!==null) html+=c(h.unp);
+    html+='</div>';return wrap(d,html);
+  }
+  if(h.tp==='compared'){
+    let html='<div class="sec"><div class="sl">ペア対応（敗者 < 勝者）</div><div class="pm">';
+    for(const p of h.pm) html+=`<div class="pc">${c(p.w,'w')}<span class="pa">▲ 大</span><span class="pa">▼ 小</span>${c(p.l,'l')}</div>`;
+    if(h.unp!==null) html+=`<div class="pc">${c(h.unp)}<span class="pa">余り</span></div>`;
+    html+='</div></div>';
+    html+=`<div class="sec"><div class="sl">勝者配列</div><div class="ch">${h.winners.map(v=>c(v,'w')).join('')}</div></div>`;
+    html+=`<div class="sec"><div class="sl">敗者配列</div><div class="ch">${h.losers.map(v=>c(v,'l')).join('')}</div></div>`;
+    return wrap(d,html);
+  }
+  if(h.tp==='rec_start'){
+    let html=`<div class="sec"><div class="sl">勝者配列を再帰ソートへ渡す</div><div class="ch">${h.winners.map(v=>c(v,'w')).join('')}</div><div style="text-align:center;color:var(--text-tertiary,#999);margin-top:6px">↓ 再帰呼び出し</div></div>`;
+    return wrap(d,html);
+  }
+  if(h.tp==='rec_done'){
+    let html=`<div class="sec"><div class="sl">再帰から復帰 — ソート済み勝者</div><div class="ch">${h.sortedW.map(v=>c(v,'w')).join('')}</div></div>`;
+    html+=`<div class="sec"><div class="sl">ペア対応（挿入時の探索上限）</div><div class="pm">`;
+    for(const p of h.pm){const wPos=h.sortedW.indexOf(p.w);html+=`<div class="pc">${c(p.w,'w')}<span class="pa">位置 ${wPos}</span>${c(p.l,'l')}<span class="pa">${p.l} の上限</span></div>`;}
+    if(h.unp!==null) html+=`<div class="pc">${c(h.unp)}<span class="pa">余り</span></div>`;
+    html+='</div></div>';return wrap(d,html);
+  }
+  if(h.tp==='ins_start'){
+    let html=`<div class="sec"><div class="sl">メインチェーン</div><div class="ch">${h.mc.map(v=>c(v,'w')).join('')}</div></div>`;
+    html+=`<div class="sec"><div class="sl">挿入対象（先頭から順に）</div><div class="ch">${h.toIns.map(t=>c(t.val,'l')).join('')}</div></div>`;
+    return wrap(d,html);
+  }
+  if(h.tp==='bsearch'){
+    const t=h.t;
+    let html='<div class="sec"><div class="sl">メインチェーン</div><div class="ch">';
+    for(let i=0;i<h.mc.length;i++){
+      let cls='';
+      if(i===t.mid)cls='hl';else if(i>=t.lo&&i<t.hi)cls='ir';else cls='dm';
+      if(i===h.uIdx&&h.partner!==null)cls+=' bm';
+      html+=`<div class="cl ${cls}">${h.mc[i]}</div>`;
+    }
+    html+='</div>';
+    html+=`<div style="font-size:12px;color:var(--text-tertiary,#999);margin:3px 0">探索範囲: ${h.hB} / ${h.mc.length} 要素${h.partner!==null?`（${h.partner} の位置で打ち切り）`:''}</div></div>`;
+    html+=`<div class="sec"><div class="sl">挿入する値</div><div class="ch">${c(h.val,'ins')}`;
+    if(h.partner!==null) html+=`<span style="font-size:12px;color:var(--text-tertiary,#999);margin-left:8px">< ${h.partner}（ペア相手）</span>`;
+    html+='</div></div>';
+    if(h.remain.length>0) html+=`<div class="sec"><div class="sl">未挿入</div><div class="ch">${h.remain.map(v=>c(v,'l')).join('')}</div></div>`;
+    return wrap(d,html);
+  }
+  if(h.tp==='inserted'){
+    let html='<div class="sec"><div class="sl">挿入後のメインチェーン</div><div class="ch">';
+    for(let i=0;i<h.mc.length;i++) html+=c(h.mc[i],h.mc[i]===h.val?'ins':'');
+    html+='</div></div>';
+    if(h.remain.length>0) html+=`<div class="sec"><div class="sl">未挿入</div><div class="ch">${h.remain.map(v=>c(v,'l')).join('')}</div></div>`;
+    return wrap(d,html);
+  }
+  return '';
+}
+
+function rn(){
+  if(!S.length)return;const s=S[ci];
+  document.getElementById('ph').textContent=s.ph;
+  document.getElementById('sp').textContent=s.sp||'';
+  document.getElementById('ds').textContent=s.ds;
+  document.getElementById('cnt').textContent=`${ci+1} / ${S.length}`;
+  document.getElementById('out').innerHTML=typeof s.r==='function'?s.r():'';
+  document.getElementById('st').innerHTML=`<div class="sc"><div class="scl">比較回数</div><div class="scv">${s.cmp}</div></div>`;
+}
+function nx(){if(ci<S.length-1){ci++;rn();}}
+function pv(){if(ci>0){ci--;rn();}}
+function sa(){if(ai){clearInterval(ai);ai=null;document.getElementById('ab').textContent='自動再生';}}
+function au(){if(ai){sa();return;}document.getElementById('ab').textContent='停止';ai=setInterval(()=>{if(ci>=S.length-1){sa();return;}nx();},1500);}
+gen();
+</script>
+</body>
+</html>
